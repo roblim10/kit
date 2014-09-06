@@ -1,6 +1,7 @@
 KIT
 ====
 Author: Robin Lim
+
 Additional credit: Margaret York
 
 KIT (or Keep In Touch) is an Android application where users can set up personal reminders to
