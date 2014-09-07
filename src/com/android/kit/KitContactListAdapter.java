@@ -48,6 +48,8 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 		return convertView;
 	}
 	
+	//Recommended pattern for managing UI components in custom ListAdapters.  This caches the view
+	//so that every call to getView() doesn't require several findViewById() call.
 	private static class ViewHolder  {
 		private TextView nameTextView;
 		private TextView subTextView;

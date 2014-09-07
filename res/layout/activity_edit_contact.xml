@@ -11,9 +11,63 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
+        android:gravity="center_vertical"
+        android:paddingBottom="10dp"
         android:textStyle="bold"
         android:textSize="24sp"
         android:drawableStart="@drawable/toucan"
         android:drawablePadding="6dp" />
     
+    <TextView
+      	android:id="@+id/activity_edit_contact_remind_instructions_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_name_textview"
+        android:text="@string/activity_edit_contact_remind_instructions" />
+    
+    <EditText
+        android:id="@+id/activity_edit_contact_number_edittext"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
+        android:inputType="number"
+        android:text="1"
+        android:gravity="end"
+        android:maxLength="3" 
+        android:selectAllOnFocus="true" />
+    
+    <Spinner 
+        android:id="@+id/activity_edit_contact_units_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
+        android:layout_toEndOf="@id/activity_edit_contact_number_edittext"
+        android:entries="@array/units_choices" />
+    
+    <TextView 
+        android:id="@+id/activity_edit_contact_contact_type_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_number_edittext"
+        android:text="@string/activity_edit_contact_contact_type_instructions"
+        android:paddingTop="10dp" />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_contact_type_textview"
+        android:orientation="vertical">
+                
+        <CheckBox 
+            android:id="@+id/activity_edit_contact_phone_call_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/phone_call" 
+            android:checked="true" />
+        <CheckBox
+            android:id="@+id/activity_edit_contact_text_message_checkbox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_message" />
+    </LinearLayout>
 </RelativeLayout>

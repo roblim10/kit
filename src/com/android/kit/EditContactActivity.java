@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnFocusChangeListener;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class EditContactActivity extends Activity {
@@ -37,9 +40,13 @@ public class EditContactActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem menuItem)  {
 		switch (menuItem.getItemId())  {
 			case R.id.action_save:
+				Intent intent = new Intent();
+				intent.putExtra(ContactListActivity.KIT_CONTACT_TO_EDIT, contactToEdit);
+				setResult(RESULT_OK, intent);
 				finish();
 				return true;
 			case R.id.action_cancel:
+				setResult(RESULT_CANCELED);
 				finish();
 				return true;
 			default:
