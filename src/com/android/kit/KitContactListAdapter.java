@@ -2,6 +2,8 @@ package com.android.kit;
 
 import java.util.List;
 
+import com.android.kit.model.KitContact;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +13,9 @@ import android.widget.TextView;
 
 
 public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
-	private final static int CONTACT_LIST_ITEM_RES_ID = 0;
-	
-	private Context context;
-	private List<KitContact> contactList;
 	
 	public KitContactListAdapter(Context context, List<KitContact> contactList)  {
-		super(context, CONTACT_LIST_ITEM_RES_ID, contactList);
-		this.context = context;
-		this.contactList = contactList;
+		super(context, R.layout.contact_list_item, contactList);
 	}
 
 	@Override
@@ -27,14 +23,14 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 		ViewHolder viewHolder;
 		if (convertView == null)  {
 			viewHolder = new ViewHolder();
-			LayoutInflater inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.contact_list_item, parent, false);
 			
 			TextView nameTextView = (TextView)convertView.findViewById(R.id.contact_list_item_name_textview);
-			viewHolder.setNameTextView(nameTextView);
+			viewHolder.nameTextView = nameTextView;
 			
 			TextView subTextView = (TextView)convertView.findViewById(R.id.contact_list_item_subtitle_textview);
-			viewHolder.setSubTextView(subTextView);
+			viewHolder.subTextView = subTextView;
 			
 			convertView.setTag(viewHolder);
 		}
@@ -42,8 +38,9 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 		
-		viewHolder.getNameTextView().setText(contactList.get(position).getName());
-		viewHolder.getSubTextView().setText("This is a test");
+		KitContact currentContact = getItem(position);
+		viewHolder.nameTextView.setText(currentContact.getName());
+		viewHolder.subTextView.setText("This is a test");
 		
 		return convertView;
 	}
@@ -51,13 +48,7 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 	//Recommended pattern for managing UI components in custom ListAdapters.  This caches the view
 	//so that every call to getView() doesn't require several findViewById() call.
 	private static class ViewHolder  {
-		private TextView nameTextView;
-		private TextView subTextView;
-		
-		public TextView getNameTextView()  { return nameTextView; }
-		public void setNameTextView(TextView textView)  { nameTextView = textView; }
-		
-		public TextView getSubTextView()  { return subTextView; }
-		public void setSubTextView(TextView textView)  { subTextView = textView; }
+		public TextView nameTextView;
+		public TextView subTextView;
 	}
 }
