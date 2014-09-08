@@ -31,18 +31,17 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
         android:inputType="number"
-        android:text="1"
         android:gravity="end"
         android:maxLength="3" 
-        android:selectAllOnFocus="true" />
+        android:selectAllOnFocus="true"
+        android:imeOptions="actionDone" />
     
     <Spinner 
         android:id="@+id/activity_edit_contact_units_spinner"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
-        android:layout_toEndOf="@id/activity_edit_contact_number_edittext"
-        android:entries="@array/units_choices" />
+        android:layout_toEndOf="@id/activity_edit_contact_number_edittext" />
     
     <TextView 
         android:id="@+id/activity_edit_contact_contact_type_textview"

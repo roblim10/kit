@@ -1,7 +1,6 @@
 package com.android.kit;
 
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -30,7 +30,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class EditContactActivity extends Activity {
+	private final static int DEFAULT_FREQUENCY = 1;
+	private final static int DEFAULT_UNIT = 1;
+	private final static TimeUnit[] SPINNER_ITEMS = {
+		TimeUnit.DAYS,
+		TimeUnit.WEEKS,
+		TimeUnit.MONTHS,
+		TimeUnit.YEARS
+	};
+	
 	private KitContact contactToEdit;
+	private boolean isNewContact;
 	
 	private EditText numberEditText;
 	private Spinner unitsSpinner;
@@ -44,20 +54,25 @@ public class EditContactActivity extends Activity {
 		
 		Intent fromIntent = getIntent();
 		contactToEdit = (KitContact)fromIntent.getParcelableExtra(ContactListActivity.KIT_CONTACT_TO_EDIT);
+		isNewContact = (boolean)fromIntent.getBooleanExtra(ContactListActivity.KIT_CONTACT_IS_NEW, false);
 		Log.i("KIT", "Editing contact: " + contactToEdit.toString());
 		
-		numberEditText = (EditText)findViewById(R.id.activity_edit_contact_number_edittext);
-		
-		unitsSpinner = (Spinner)findViewById(R.id.activity_edit_contact_units_spinner);
 		TextView nameTextView = (TextView)findViewById(R.id.activity_edit_contact_name_textview);
-		
 		nameTextView.setText(contactToEdit.getName());
+		
+		numberEditText = (EditText)findViewById(R.id.activity_edit_contact_number_edittext);
+		numberEditText.setText(
+				Integer.toString(!isNewContact ? contactToEdit.getReminderFrequency() : DEFAULT_FREQUENCY));
+		
+		setupSpinner();
 		
 		setupContactTypeListView();
 	}
 	
 	private void setupContactTypeListView()  {
+
 		List<CheckBoxListItemModel<ContactType>> options = Lists.newArrayList();
+		
 		options.add(new CheckBoxListItemModel<ContactType>(ContactType.PHONE_CALL, 
 				ContactType.PHONE_CALL.toString(), true));
 		options.add(new CheckBoxListItemModel<ContactType>(ContactType.SMS, ContactType.SMS.toString()));
@@ -73,6 +88,22 @@ public class EditContactActivity extends Activity {
 				model.setIsChecked(true);
 			}
 		});
+	}
+	
+	private void setupSpinner()  {
+		//TODO: Fast way of doing this, but the enum strings are not localizable. Fix later.
+		ArrayAdapter<TimeUnit> timeUnitAdapter = new ArrayAdapter<TimeUnit>(this, 
+				android.R.layout.simple_spinner_item, SPINNER_ITEMS);
+		timeUnitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		unitsSpinner = (Spinner)findViewById(R.id.activity_edit_contact_units_spinner);
+		unitsSpinner.setAdapter(timeUnitAdapter);
+		if(!isNewContact)  {
+			int pos = timeUnitAdapter.getPosition(contactToEdit.getReminderFrequencyUnit());
+			unitsSpinner.setSelection(pos);
+		}
+		else  {
+			unitsSpinner.setSelection(DEFAULT_UNIT);
+		}
 	}
 	
 	@Override
@@ -104,7 +135,7 @@ public class EditContactActivity extends Activity {
 	
 	private void saveContact()  {
 		int frequency = Integer.parseInt(numberEditText.getText().toString());
-		TimeUnit units = getUnitSpinnerValue();
+		TimeUnit units = (TimeUnit)unitsSpinner.getSelectedItem();
 		//TODO: This isn't correct. Need to adjust so that we don't always add from current date/time.
 		DateTime nextReminderDate = calculateNextReminderDate(DateTime.now(), frequency, units);
 		Set<ContactType> contactTypes = getSelectedContactTypes();
@@ -114,19 +145,7 @@ public class EditContactActivity extends Activity {
 		contactToEdit.setNextReminderDate(nextReminderDate);
 		contactToEdit.setContactTypes(contactTypes);
 	}
-	
-	//TODO: Two switch statements in the next two methods.  Can we do something better?
-	private TimeUnit getUnitSpinnerValue()  {
-		int spinnerPosition = unitsSpinner.getSelectedItemPosition();
-		switch(spinnerPosition)  {
-			case 0: return TimeUnit.DAYS;
-			case 1: return TimeUnit.WEEKS;
-			case 2: return TimeUnit.MONTHS;
-			case 3: return TimeUnit.YEARS;
-			default: throw new UnsupportedOperationException(
-					"User selected TimeUnit that is not supported.  TimeUnit position = " + spinnerPosition);
-		}
-	}
+
 	
 	private DateTime calculateNextReminderDate(DateTime fromDate, int frequency, TimeUnit units)  {
 		switch(units)  {

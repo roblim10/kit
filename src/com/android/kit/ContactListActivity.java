@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 public class ContactListActivity extends Activity {
 	
 	public final static String KIT_CONTACT_TO_EDIT = "com.android.kit.editcontact";
+	public final static String KIT_CONTACT_IS_NEW = "com.android.kit.isnewcontact";
 	private final static int PICK_CONTACT_REQUEST = 1001;
 	private final static int EDIT_CONTACT_REQUEST = 1002;
 	private final static int ADD_CONTACT_REQUEST = 1003;
@@ -128,6 +129,7 @@ public class ContactListActivity extends Activity {
 	private void launchEditContactActivity(KitContact contactToEdit, boolean isNewContact)  {
 		Intent editContactIntent = new Intent(this, EditContactActivity.class);
 		editContactIntent.putExtra(KIT_CONTACT_TO_EDIT, contactToEdit);
+		editContactIntent.putExtra(KIT_CONTACT_IS_NEW, isNewContact);
 		startActivityForResult(editContactIntent, 
 				isNewContact ? ADD_CONTACT_REQUEST : EDIT_CONTACT_REQUEST);
 	}
