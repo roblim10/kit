@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.kit.model.KitContact;
 import com.google.common.collect.Lists;
 
 public class ContactListActivity extends Activity {
@@ -62,7 +63,7 @@ public class ContactListActivity extends Activity {
 		listView.setOnItemClickListener(new OnItemClickListener()  {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				KitContact contactToEdit = contactList.get(position);
+				KitContact contactToEdit = (KitContact)parent.getItemAtPosition(position);
 				launchEditContactActivity(contactToEdit, false);
 			}
 		});

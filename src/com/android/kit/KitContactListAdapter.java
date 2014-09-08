@@ -5,6 +5,7 @@ import java.util.List;
 import com.android.kit.model.KitContact;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,9 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 			TextView subTextView = (TextView)convertView.findViewById(R.id.contact_list_item_subtitle_textview);
 			viewHolder.subTextView = subTextView;
 			
+			TextView reminderTextView = (TextView)convertView.findViewById(R.id.contact_list_item_reminder_textview);
+			viewHolder.reminderTextView = reminderTextView;
+			
 			convertView.setTag(viewHolder);
 		}
 		else  {
@@ -40,7 +44,12 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 		
 		KitContact currentContact = getItem(position);
 		viewHolder.nameTextView.setText(currentContact.getName());
-		viewHolder.subTextView.setText("This is a test");
+		viewHolder.subTextView.setText("Test text");
+		viewHolder.reminderTextView.setText(currentContact.getNextReminderDate() != null ?
+				//TODO: Get Android date/time format
+				//TODO: Better text
+				"Reminder set to contact by " + currentContact.getNextReminderDate().toString("MM/dd/yyyy") :
+				"No reminder set");
 		
 		return convertView;
 	}
@@ -50,5 +59,6 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 	private static class ViewHolder  {
 		public TextView nameTextView;
 		public TextView subTextView;
+		public TextView reminderTextView;
 	}
 }

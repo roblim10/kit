@@ -6,15 +6,15 @@
     <string name="no_contacts_message">No contacts found.</string>
     <string name="contact_list_item_imageview_desc">Profile image for contact</string>
     <string name="activity_edit_contact_imageview_desc">Profile image for contact</string>
-    <string name="activity_edit_contact_remind_instructions">Remind me to contact this person every...</string>
-    <string name="activity_edit_contact_contact_type_instructions">Type of contact(s):</string>
+    <string name="activity_edit_contact_remind_instructions">Remind me to contact this person every&#8230;</string>
+    <string name="activity_edit_contact_contact_type_instructions">Types of contact:</string>
     <string name="title_activity_edit_contact">Edit contact</string>
 
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
     
-    <string name="phone_call">Phone call</string>
-    <string name="text_message">Text message</string>
+    <string name="contact_type_phone_call">Phone call</string>
+    <string name="contact_type_text_message">Text message</string>
     
     <string-array name="units_choices">
         <item>day(s)</item>

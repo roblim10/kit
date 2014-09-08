@@ -35,13 +35,13 @@ public final class R {
         public static final int activity_contact_list_add_contact_button=0x7f090000;
         public static final int activity_contact_list_listview=0x7f090001;
         public static final int activity_contact_list_no_contacts_textview=0x7f090002;
+        public static final int activity_edit_contact_contact_type_listview=0x7f090008;
         public static final int activity_edit_contact_contact_type_textview=0x7f090007;
         public static final int activity_edit_contact_name_textview=0x7f090003;
         public static final int activity_edit_contact_number_edittext=0x7f090005;
-        public static final int activity_edit_contact_phone_call_checkbox=0x7f090008;
         public static final int activity_edit_contact_remind_instructions_textview=0x7f090004;
-        public static final int activity_edit_contact_text_message_checkbox=0x7f090009;
         public static final int activity_edit_contact_units_spinner=0x7f090006;
+        public static final int checkbox_list_item_checkbox=0x7f090009;
         public static final int contact_list_item_name_textview=0x7f09000b;
         public static final int contact_list_item_profile_imageview=0x7f09000a;
         public static final int contact_list_item_reminder_textview=0x7f09000d;
@@ -50,7 +50,8 @@ public final class R {
     public static final class layout {
         public static final int activity_contact_list=0x7f030000;
         public static final int activity_edit_contact=0x7f030001;
-        public static final int contact_list_item=0x7f030002;
+        public static final int checkbox_list_item=0x7f030002;
+        public static final int contact_list_item=0x7f030003;
     }
     public static final class menu {
         public static final int activity_edit_contact_menu=0x7f080000;
@@ -64,9 +65,9 @@ public final class R {
         public static final int add_contact=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int contact_list_item_imageview_desc=0x7f050003;
+        public static final int contact_type_phone_call=0x7f05000a;
+        public static final int contact_type_text_message=0x7f05000b;
         public static final int no_contacts_message=0x7f050002;
-        public static final int phone_call=0x7f05000a;
-        public static final int text_message=0x7f05000b;
         public static final int title_activity_edit_contact=0x7f050007;
     }
     public static final class style {
