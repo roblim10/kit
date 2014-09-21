@@ -1,7 +1,10 @@
 package com.android.kit;
 
 
+import java.util.HashSet;
 import java.util.List;
+
+import org.joda.time.DateTime;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -18,7 +21,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.kit.model.ContactType;
 import com.android.kit.model.KitContact;
+import com.android.kit.model.TimeUnit;
 import com.google.common.collect.Lists;
 
 public class ContactListActivity extends Activity {
@@ -65,6 +70,7 @@ public class ContactListActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				KitContact contactToEdit = (KitContact)parent.getItemAtPosition(position);
+				Log.i("KIT", "contactToEdit = " + contactToEdit.hashCode());
 				launchEditContactActivity(contactToEdit, false);
 			}
 		});
@@ -95,6 +101,11 @@ public class ContactListActivity extends Activity {
 					handleAddContactActivityRequest(data);
 				}
 				break;
+			case EDIT_CONTACT_REQUEST:
+				if (resultCode == Activity.RESULT_OK)  {
+					handleEditContactActivityRequest(data);
+				}
+				break;
 		}
 	}
 	
@@ -110,14 +121,30 @@ public class ContactListActivity extends Activity {
 			Log.i("KIT", "Created contact " + newContact.toString());
 		}
 		c.close();
+		listAdapter.add(newContact);
 		launchEditContactActivity(newContact, true);		
 	}
 	
 	private void handleAddContactActivityRequest(Intent data)  {
-		KitContact contactToEdit = (KitContact)data.getParcelableExtra(KIT_CONTACT_TO_EDIT);
-		contactList.add(contactToEdit);
+		handleEditContactActivityRequest(data);
 		listAdapter.notifyDataSetChanged();
 		updateNoContactsVisibility();
+	}
+	
+	private void handleEditContactActivityRequest(Intent data)  {
+		int contactId = data.getIntExtra(EditContactActivity.EXTRA_CONTACT_ID, 0);
+		int frequency = data.getIntExtra(EditContactActivity.EXTRA_FREQUENCY, 0);
+		TimeUnit units = (TimeUnit)data.getSerializableExtra(EditContactActivity.EXTRA_UNIT);
+		DateTime nextReminder = (DateTime)data.getSerializableExtra(EditContactActivity.EXTRA_NEXT_REMINDER);
+		HashSet<ContactType> contactTypes = (HashSet<ContactType>)
+				data.getSerializableExtra(EditContactActivity.EXTRA_CONTACT_TYPES);
+		
+		KitContact contactToEdit = listAdapter.getContactById(contactId);
+		contactToEdit.setReminderFrequency(frequency);
+		contactToEdit.setReminderFrequencyUnit(units);
+		contactToEdit.setNextReminderDate(nextReminder);
+		contactToEdit.setContactTypes(contactTypes);
+		
 	}
 	
 	private void updateNoContactsVisibility()  {

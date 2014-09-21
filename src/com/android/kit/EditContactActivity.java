@@ -1,6 +1,7 @@
 package com.android.kit;
 
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -9,13 +10,9 @@ import org.joda.time.DateTime;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -30,8 +27,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class EditContactActivity extends Activity {
+	public final static String EXTRA_CONTACT_ID = "CONTACT_ID";
+	public final static String EXTRA_FREQUENCY = "FREQUENCY";
+	public final static String EXTRA_UNIT = "UNIT";
+	public final static String EXTRA_NEXT_REMINDER = "NEXT_REMINDER";
+	public final static String EXTRA_CONTACT_TYPES = "CONTACT_TYPES";
+	
 	private final static int DEFAULT_FREQUENCY = 1;
-	private final static int DEFAULT_UNIT = 1;
+	private final static TimeUnit DEFAULT_UNIT = TimeUnit.WEEKS;
 	private final static TimeUnit[] SPINNER_ITEMS = {
 		TimeUnit.DAYS,
 		TimeUnit.WEEKS,
@@ -39,10 +42,21 @@ public class EditContactActivity extends Activity {
 		TimeUnit.YEARS
 	};
 	
+	private final static List<CheckBoxListItemModel<ContactType>> TYPE_ITEMS = Lists.newArrayList(
+			new CheckBoxListItemModel<ContactType>(ContactType.PHONE_CALL, ContactType.PHONE_CALL.toString()),
+			new CheckBoxListItemModel<ContactType>(ContactType.SMS, ContactType.SMS.toString())
+		);
+	
+	private final static Set<ContactType> DEFAULT_CHECKED_TYPES = Sets.newHashSet(
+			ContactType.PHONE_CALL
+		);
+	
 	private KitContact contactToEdit;
 	private boolean isNewContact;
 	
+	private TextView nameTextView;
 	private EditText numberEditText;
+	private ArrayAdapter<TimeUnit> spinnerAdapter;
 	private Spinner unitsSpinner;
 	private CheckBoxListAdapter<ContactType> contactTypeListAdapter;
 	private ListView contactTypeListView;
@@ -55,54 +69,51 @@ public class EditContactActivity extends Activity {
 		Intent fromIntent = getIntent();
 		contactToEdit = (KitContact)fromIntent.getParcelableExtra(ContactListActivity.KIT_CONTACT_TO_EDIT);
 		isNewContact = (boolean)fromIntent.getBooleanExtra(ContactListActivity.KIT_CONTACT_IS_NEW, false);
-		Log.i("KIT", "Editing contact: " + contactToEdit.toString());
-		
-		TextView nameTextView = (TextView)findViewById(R.id.activity_edit_contact_name_textview);
-		nameTextView.setText(contactToEdit.getName());
-		
+		nameTextView = (TextView)findViewById(R.id.activity_edit_contact_name_textview);
 		numberEditText = (EditText)findViewById(R.id.activity_edit_contact_number_edittext);
-		numberEditText.setText(
-				Integer.toString(!isNewContact ? contactToEdit.getReminderFrequency() : DEFAULT_FREQUENCY));
-		
 		setupSpinner();
-		
 		setupContactTypeListView();
+		
+		populateViews();
 	}
 	
 	private void setupContactTypeListView()  {
-
 		List<CheckBoxListItemModel<ContactType>> options = Lists.newArrayList();
-		
-		options.add(new CheckBoxListItemModel<ContactType>(ContactType.PHONE_CALL, 
-				ContactType.PHONE_CALL.toString(), true));
-		options.add(new CheckBoxListItemModel<ContactType>(ContactType.SMS, ContactType.SMS.toString()));
+		for (CheckBoxListItemModel<ContactType> item : TYPE_ITEMS)  {
+			options.add(item);	
+		}
 		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, options);
 		contactTypeListView = (ListView)findViewById(R.id.activity_edit_contact_contact_type_listview);
 		contactTypeListView.setAdapter(contactTypeListAdapter);
-		
-		contactTypeListView.setOnItemClickListener(new OnItemClickListener()  {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				CheckBoxListItemModel<ContactType> model = 
-						(CheckBoxListItemModel<ContactType>)parent.getItemAtPosition(position);
-				model.setIsChecked(true);
-			}
-		});
 	}
 	
 	private void setupSpinner()  {
 		//TODO: Fast way of doing this, but the enum strings are not localizable. Fix later.
-		ArrayAdapter<TimeUnit> timeUnitAdapter = new ArrayAdapter<TimeUnit>(this, 
+		spinnerAdapter = new ArrayAdapter<TimeUnit>(this, 
 				android.R.layout.simple_spinner_item, SPINNER_ITEMS);
-		timeUnitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		unitsSpinner = (Spinner)findViewById(R.id.activity_edit_contact_units_spinner);
-		unitsSpinner.setAdapter(timeUnitAdapter);
+		unitsSpinner.setAdapter(spinnerAdapter);
+	}
+	
+	private void populateViews()  {
+		String name = contactToEdit.getName();
+		int frequency = DEFAULT_FREQUENCY;
+		TimeUnit units = DEFAULT_UNIT;
+		Set<ContactType> checkedTypes = DEFAULT_CHECKED_TYPES;
 		if(!isNewContact)  {
-			int pos = timeUnitAdapter.getPosition(contactToEdit.getReminderFrequencyUnit());
-			unitsSpinner.setSelection(pos);
+			frequency = contactToEdit.getReminderFrequency();
+			units = contactToEdit.getReminderFrequencyUnit();
+			checkedTypes = contactToEdit.getContactTypes();
 		}
-		else  {
-			unitsSpinner.setSelection(DEFAULT_UNIT);
+		
+		nameTextView.setText(name);
+		numberEditText.setText(Integer.toString(frequency));
+		unitsSpinner.setSelection(spinnerAdapter.getPosition(units));
+		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
+			CheckBoxListItemModel<ContactType> model = contactTypeListAdapter.getItem(i);
+			boolean isChecked = checkedTypes.contains(model.getData());
+			model.setChecked(isChecked);
 		}
 	}
 	
@@ -118,9 +129,8 @@ public class EditContactActivity extends Activity {
 		switch (menuItem.getItemId())  {
 			case R.id.action_save:
 				//TODO: Need to validate input
-				saveContact();
 				Intent intent = new Intent();
-				intent.putExtra(ContactListActivity.KIT_CONTACT_TO_EDIT, contactToEdit);
+				intent.putExtras(createResultBundle());
 				setResult(RESULT_OK, intent);
 				finish();
 				return true;
@@ -133,17 +143,20 @@ public class EditContactActivity extends Activity {
 		}
 	}
 	
-	private void saveContact()  {
+	private Bundle createResultBundle()  {
 		int frequency = Integer.parseInt(numberEditText.getText().toString());
 		TimeUnit units = (TimeUnit)unitsSpinner.getSelectedItem();
 		//TODO: This isn't correct. Need to adjust so that we don't always add from current date/time.
 		DateTime nextReminderDate = calculateNextReminderDate(DateTime.now(), frequency, units);
-		Set<ContactType> contactTypes = getSelectedContactTypes();
+		HashSet<ContactType> contactTypes = Sets.newHashSet(contactTypeListAdapter.getSelectedItems());
 		
-		contactToEdit.setReminderFrequency(frequency);
-		contactToEdit.setReminderFrequencyUnit(units);
-		contactToEdit.setNextReminderDate(nextReminderDate);
-		contactToEdit.setContactTypes(contactTypes);
+		Bundle bundle = new Bundle();
+		bundle.putInt(EXTRA_CONTACT_ID, contactToEdit.getId());
+		bundle.putInt(EXTRA_FREQUENCY, frequency);
+		bundle.putSerializable(EXTRA_UNIT, units);
+		bundle.putSerializable(EXTRA_NEXT_REMINDER, nextReminderDate);
+		bundle.putSerializable(EXTRA_CONTACT_TYPES, contactTypes);
+		return bundle;
 	}
 
 	
@@ -156,16 +169,5 @@ public class EditContactActivity extends Activity {
 			default: throw new UnsupportedOperationException(
 					"Unknown time unit when calculating reminder date.  TimeUnit = " + units.toString());
 		}
-	}
-	
-	private Set<ContactType> getSelectedContactTypes()  {
-		Set<ContactType> contactTypes = Sets.newHashSet();
-		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
-			CheckBoxListItemModel<ContactType> model = contactTypeListAdapter.getItem(i);
-			if (model.isChecked())  {
-				contactTypes.add(model.getData());
-			}
-		}
-		return contactTypes;
 	}
 }

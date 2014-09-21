@@ -27,7 +27,7 @@ public class CheckBoxListItemModel<T> {
 		return isChecked;
 	}
 	
-	public void setIsChecked(boolean isChecked)  {
+	public void setChecked(boolean isChecked)  {
 		this.isChecked = isChecked;
 	}
 }

@@ -1,6 +1,7 @@
 package com.android.kit;
 
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,12 +11,19 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.android.kit.model.KitContact;
+import com.google.common.collect.Maps;
 
 
 public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 	
+	private Map<Integer, KitContact> contactMap;
+	
 	public KitContactListAdapter(Context context, List<KitContact> contactList)  {
 		super(context, R.layout.contact_list_item, contactList);
+		contactMap = Maps.newHashMap();
+		for (KitContact contact : contactList)  {
+			contactMap.put(contact.getId(), contact);
+		}
 	}
 
 	@Override
@@ -51,6 +59,18 @@ public class KitContactListAdapter extends ArrayAdapter<KitContact>  {
 				"No reminder set");
 		
 		return convertView;
+	}
+	
+	@Override
+	public void add(KitContact contact)  {
+		super.add(contact);
+		contactMap.put(contact.getId(), contact);
+	}
+	
+	//TODO:Add other add/remove methods here.
+	
+	public KitContact getContactById(int id)  {
+		return contactMap.get(id);
 	}
 	
 	//Recommended pattern for managing UI components in custom ListAdapters.  This caches the view
