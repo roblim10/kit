@@ -3,8 +3,6 @@ package com.android.kit;
 
 import java.util.List;
 
-import org.joda.time.DateTime;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -20,15 +18,12 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android.kit.model.ContactType;
 import com.android.kit.model.KitContact;
-import com.android.kit.model.TimeUnit;
-import com.google.common.collect.Lists;
+import com.android.kit.sqlite.KitContactDatabase;
 
 public class ContactListActivity extends Activity {
 	
 	public final static String KIT_CONTACT_TO_EDIT = "com.android.kit.editcontact";
-	public final static String KIT_CONTACT_IS_NEW = "com.android.kit.isnewcontact";
 	private final static int PICK_CONTACT_REQUEST = 1001;
 	private final static int EDIT_CONTACT_REQUEST = 1002;
 	private final static int ADD_CONTACT_REQUEST = 1003;
@@ -36,8 +31,8 @@ public class ContactListActivity extends Activity {
 	private TextView noContactsTextView;
 	private ListView listView;
 	
-	private List<KitContact> contactList;
 	private KitContactListAdapter listAdapter;
+	private KitContactDatabase contactsDb;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)  {
@@ -45,31 +40,28 @@ public class ContactListActivity extends Activity {
 		setContentView(R.layout.activity_contact_list);
 		getActionBar().setDisplayShowTitleEnabled(false);
 		
-		populateContacts();
+		setupDatabase();
 		setupListView();
 		setupAddContactButton();
 		
 		noContactsTextView = (TextView)findViewById(R.id.activity_contact_list_no_contacts_textview);
-		updateNoContactsVisibility();
+		updateViewVisibility();
 	}
 	
-	private void populateContacts()  {
-		contactList = Lists.newArrayList();
-		//KitContact test = new KitContact(4);
-		//test.setName("Test Man");
-		//contactList.add(test);
-		//TODO: Read list of contacts from storage
+	private void setupDatabase()  {
+		contactsDb = new KitContactDatabase(this);
+		contactsDb.open();
 	}
 	
 	private void setupListView()  {
-		listAdapter = new KitContactListAdapter(this, contactList);
+		List<KitContact> contacts = contactsDb.readAllContacts();
+		listAdapter = new KitContactListAdapter(this, contacts);
 		listView = (ListView)findViewById(R.id.activity_contact_list_listview);
 		listView.setAdapter(listAdapter);
 		listView.setOnItemClickListener(new OnItemClickListener()  {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				KitContact contactToEdit = (KitContact)parent.getItemAtPosition(position);
-				Log.i("KIT", "contactToEdit = " + contactToEdit.hashCode());
 				launchEditContactActivity(contactToEdit, false);
 			}
 		});
@@ -87,6 +79,13 @@ public class ContactListActivity extends Activity {
 	}
 	
 	@Override
+	protected void onDestroy()  {
+		Log.d("KIT", "closing database");
+		contactsDb.close();
+		super.onStop();
+	}
+	
+	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data)  {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch(requestCode)  {
@@ -98,11 +97,13 @@ public class ContactListActivity extends Activity {
 			case ADD_CONTACT_REQUEST:
 				if (resultCode == Activity.RESULT_OK)  {
 					handleAddContactActivityRequest(data);
+					refreshUi();
 				}
 				break;
 			case EDIT_CONTACT_REQUEST:
 				if (resultCode == Activity.RESULT_OK)  {
 					handleEditContactActivityRequest(data);
+					refreshUi();
 				}
 				break;
 		}
@@ -121,33 +122,34 @@ public class ContactListActivity extends Activity {
 		}
 		c.close();
 		listAdapter.add(newContact);
+		contactsDb.insert(newContact);
 		launchEditContactActivity(newContact, true);		
 	}
 	
 	private void handleAddContactActivityRequest(Intent data)  {
-		handleEditContactActivityRequest(data);
-		listAdapter.notifyDataSetChanged();
-		updateNoContactsVisibility();
+		KitContact editedContact = data.getParcelableExtra(EditContactActivity.EXTRA_EDITED_CONTACT);
+		listAdapter.add(editedContact);
+		contactsDb.insert(editedContact);
 	}
 	
 	private void handleEditContactActivityRequest(Intent data)  {
-		//TODO: Fix defaults and do error checking
-		int contactId = data.getIntExtra(EditContactActivity.EXTRA_CONTACT_ID, 0);
-		int frequency = data.getIntExtra(EditContactActivity.EXTRA_FREQUENCY, 0);
-		int unitsId = data.getIntExtra(EditContactActivity.EXTRA_UNIT, 0);
-		long nextReminderMillis = data.getLongExtra(EditContactActivity.EXTRA_NEXT_REMINDER, 0);
-		int contactTypesFlag = data.getIntExtra(EditContactActivity.EXTRA_CONTACT_TYPES, 0);
-		
-		KitContact contactToEdit = listAdapter.getContactById(contactId);
-		contactToEdit.setReminderFrequency(frequency);
-		contactToEdit.setReminderFrequencyUnit(TimeUnit.getTimeUnitFromId(unitsId));
-		contactToEdit.setNextReminderDate(new DateTime(nextReminderMillis));
-		contactToEdit.setContactTypes(ContactType.convertContactTypeValue(contactTypesFlag));
+		KitContact editedContact = data.getParcelableExtra(EditContactActivity.EXTRA_EDITED_CONTACT);
+		KitContact existingContact = listAdapter.getContactById(editedContact.getId());
+		existingContact.setReminderFrequency(editedContact.getReminderFrequency());
+		existingContact.setReminderFrequencyUnit(editedContact.getReminderFrequencyUnit());
+		existingContact.setNextReminderDate(editedContact.getNextReminderDate());
+		existingContact.setContactTypes(editedContact.getContactTypes());
+		contactsDb.update(existingContact);
 		
 	}
 	
-	private void updateNoContactsVisibility()  {
-		boolean noContacts = contactList.isEmpty();
+	private void refreshUi()  {
+		listAdapter.notifyDataSetChanged();
+		updateViewVisibility();
+	}
+	
+	private void updateViewVisibility()  {
+		boolean noContacts = listAdapter.isEmpty();
 		noContactsTextView.setVisibility(noContacts ? View.VISIBLE : View.GONE);
 		listView.setVisibility(noContacts ? View.GONE : View.VISIBLE);
 	}
@@ -155,7 +157,6 @@ public class ContactListActivity extends Activity {
 	private void launchEditContactActivity(KitContact contactToEdit, boolean isNewContact)  {
 		Intent editContactIntent = new Intent(this, EditContactActivity.class);
 		editContactIntent.putExtra(KIT_CONTACT_TO_EDIT, contactToEdit);
-		editContactIntent.putExtra(KIT_CONTACT_IS_NEW, isNewContact);
 		startActivityForResult(editContactIntent, 
 				isNewContact ? ADD_CONTACT_REQUEST : EDIT_CONTACT_REQUEST);
 	}

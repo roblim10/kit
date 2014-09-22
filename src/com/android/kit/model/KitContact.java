@@ -1,7 +1,6 @@
 package com.android.kit.model;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.joda.time.DateTime;
@@ -9,17 +8,18 @@ import org.joda.time.DateTime;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.common.collect.Sets;
+
 public class KitContact implements Parcelable {
 	private int id;
 	private String name;
-	private int reminderFrequency;
-	private TimeUnit reminderFrequencyUnit;
-	private DateTime nextReminderDate;
-	private Set<ContactType> contactTypes;
+	private int reminderFrequency = 1;
+	private TimeUnit reminderFrequencyUnit = TimeUnit.WEEKS;
+	private DateTime nextReminderDate = DateTime.now().plusWeeks(1);
+	private Set<ContactType> contactTypes = Sets.newHashSet(ContactType.PHONE_CALL);
 	
 	public KitContact(int id)  {
 		this.id = id;
-		contactTypes = new HashSet<ContactType>();
 	}
 	
 	public KitContact(Parcel in)  {
@@ -27,8 +27,7 @@ public class KitContact implements Parcelable {
 		this.name = in.readString();
 		this.reminderFrequency = in.readInt();
 		this.reminderFrequencyUnit = TimeUnit.getTimeUnitFromId(in.readInt());
-		Long nextReminderDateLong = (Long)in.readValue(null);
-		this.nextReminderDate = nextReminderDateLong != null ? new DateTime(nextReminderDateLong) : null;
+		this.nextReminderDate = new DateTime(in.readLong());
 		this.contactTypes = ContactType.convertContactTypeValue(in.readInt());
 	}
 	
@@ -57,6 +56,10 @@ public class KitContact implements Parcelable {
 	}
 	
 	public void setReminderFrequencyUnit(TimeUnit unit)  {
+		//TODO: Apache has a NullArgumentException.
+		if (unit == null)  {
+			throw new UnsupportedOperationException("Cannot set reminder frequency unit to null");
+		}
 		this.reminderFrequencyUnit = unit;
 	}
 	
@@ -65,6 +68,10 @@ public class KitContact implements Parcelable {
 	}
 	
 	public void setNextReminderDate(DateTime date)  {
+		//TODO: Apache has a NullArgumentException.
+		if (date == null)  {
+			throw new UnsupportedOperationException("Cannot set next reminder date to null");
+		}
 		this.nextReminderDate = date;
 	}
 	
@@ -96,7 +103,7 @@ public class KitContact implements Parcelable {
 		dest.writeString(name);
 		dest.writeInt(reminderFrequency);
 		dest.writeInt(reminderFrequencyUnit.getId());
-		dest.writeValue(nextReminderDate != null ? nextReminderDate.getMillis() : null);
+		dest.writeLong(nextReminderDate.getMillis());
 		dest.writeInt(ContactType.convertContactTypeCollection(contactTypes));
 	}
 	
