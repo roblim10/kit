@@ -15,7 +15,7 @@ public class KitContact implements Parcelable {
 	private int reminderFrequency;
 	private TimeUnit reminderFrequencyUnit;
 	private DateTime nextReminderDate;
-	private HashSet<ContactType> contactTypes;
+	private Set<ContactType> contactTypes;
 	
 	public KitContact(int id)  {
 		this.id = id;
@@ -26,10 +26,10 @@ public class KitContact implements Parcelable {
 		this.id = in.readInt();
 		this.name = in.readString();
 		this.reminderFrequency = in.readInt();
-		this.reminderFrequencyUnit = (TimeUnit)in.readSerializable();
+		this.reminderFrequencyUnit = TimeUnit.getTimeUnitFromId(in.readInt());
 		Long nextReminderDateLong = (Long)in.readValue(null);
 		this.nextReminderDate = nextReminderDateLong != null ? new DateTime(nextReminderDateLong) : null;
-		this.contactTypes = (HashSet<ContactType>)in.readSerializable();
+		this.contactTypes = ContactType.convertContactTypeValue(in.readInt());
 	}
 	
 	public int getId()  {
@@ -95,9 +95,9 @@ public class KitContact implements Parcelable {
 		dest.writeInt(id);
 		dest.writeString(name);
 		dest.writeInt(reminderFrequency);
-		dest.writeSerializable(reminderFrequencyUnit);
+		dest.writeInt(reminderFrequencyUnit.getId());
 		dest.writeValue(nextReminderDate != null ? nextReminderDate.getMillis() : null);
-		dest.writeSerializable(contactTypes);
+		dest.writeInt(ContactType.convertContactTypeCollection(contactTypes));
 	}
 	
 	public static final Parcelable.Creator<KitContact> CREATOR = new Parcelable.Creator<KitContact>()  {

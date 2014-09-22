@@ -153,9 +153,9 @@ public class EditContactActivity extends Activity {
 		Bundle bundle = new Bundle();
 		bundle.putInt(EXTRA_CONTACT_ID, contactToEdit.getId());
 		bundle.putInt(EXTRA_FREQUENCY, frequency);
-		bundle.putSerializable(EXTRA_UNIT, units);
-		bundle.putSerializable(EXTRA_NEXT_REMINDER, nextReminderDate);
-		bundle.putSerializable(EXTRA_CONTACT_TYPES, contactTypes);
+		bundle.putInt(EXTRA_UNIT, units.getId());
+		bundle.putLong(EXTRA_NEXT_REMINDER, nextReminderDate.getMillis());
+		bundle.putInt(EXTRA_CONTACT_TYPES, ContactType.convertContactTypeCollection(contactTypes));
 		return bundle;
 	}
 

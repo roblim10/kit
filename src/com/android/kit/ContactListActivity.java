@@ -1,7 +1,6 @@
 package com.android.kit;
 
 
-import java.util.HashSet;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -132,18 +131,18 @@ public class ContactListActivity extends Activity {
 	}
 	
 	private void handleEditContactActivityRequest(Intent data)  {
+		//TODO: Fix defaults and do error checking
 		int contactId = data.getIntExtra(EditContactActivity.EXTRA_CONTACT_ID, 0);
 		int frequency = data.getIntExtra(EditContactActivity.EXTRA_FREQUENCY, 0);
-		TimeUnit units = (TimeUnit)data.getSerializableExtra(EditContactActivity.EXTRA_UNIT);
-		DateTime nextReminder = (DateTime)data.getSerializableExtra(EditContactActivity.EXTRA_NEXT_REMINDER);
-		HashSet<ContactType> contactTypes = (HashSet<ContactType>)
-				data.getSerializableExtra(EditContactActivity.EXTRA_CONTACT_TYPES);
+		int unitsId = data.getIntExtra(EditContactActivity.EXTRA_UNIT, 0);
+		long nextReminderMillis = data.getLongExtra(EditContactActivity.EXTRA_NEXT_REMINDER, 0);
+		int contactTypesFlag = data.getIntExtra(EditContactActivity.EXTRA_CONTACT_TYPES, 0);
 		
 		KitContact contactToEdit = listAdapter.getContactById(contactId);
 		contactToEdit.setReminderFrequency(frequency);
-		contactToEdit.setReminderFrequencyUnit(units);
-		contactToEdit.setNextReminderDate(nextReminder);
-		contactToEdit.setContactTypes(contactTypes);
+		contactToEdit.setReminderFrequencyUnit(TimeUnit.getTimeUnitFromId(unitsId));
+		contactToEdit.setNextReminderDate(new DateTime(nextReminderMillis));
+		contactToEdit.setContactTypes(ContactType.convertContactTypeValue(contactTypesFlag));
 		
 	}
 	
