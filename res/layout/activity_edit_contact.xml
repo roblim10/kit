@@ -25,29 +25,30 @@
         android:layout_below="@id/activity_edit_contact_name_textview"
         android:text="@string/activity_edit_contact_remind_instructions" />
     
-    <EditText
-        android:id="@+id/activity_edit_contact_number_edittext"
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
-        android:inputType="number"
-        android:gravity="end"
-        android:maxLength="3" 
-        android:selectAllOnFocus="true"
-        android:imeOptions="actionDone" />
-    
-    <Spinner 
-        android:id="@+id/activity_edit_contact_units_spinner"
+    <NumberPicker 
+        android:id="@+id/activity_edit_contact_number_picker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
-        android:layout_toEndOf="@id/activity_edit_contact_number_edittext" />
+        android:layout_margin="6dp"
+        android:gravity="center_horizontal"
+        android:descendantFocusability="blocksDescendants" />
+	
+    <NumberPicker
+        android:id="@+id/activity_edit_contact_unit_picker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/activity_edit_contact_remind_instructions_textview"
+        android:layout_toEndOf="@id/activity_edit_contact_number_picker"
+        android:layout_margin="6dp"
+        android:gravity="center_horizontal"
+        android:descendantFocusability="blocksDescendants" />
     
     <TextView 
         android:id="@+id/activity_edit_contact_contact_type_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/activity_edit_contact_number_edittext"
+        android:layout_below="@id/activity_edit_contact_number_picker"
         android:text="@string/activity_edit_contact_contact_type_instructions"
         android:paddingTop="10dp" />
     

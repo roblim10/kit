@@ -35,9 +35,9 @@ public final class R {
         public static final int activity_edit_contact_contact_type_listview=0x7f080008;
         public static final int activity_edit_contact_contact_type_textview=0x7f080007;
         public static final int activity_edit_contact_name_textview=0x7f080003;
-        public static final int activity_edit_contact_number_edittext=0x7f080005;
+        public static final int activity_edit_contact_number_picker=0x7f080005;
         public static final int activity_edit_contact_remind_instructions_textview=0x7f080004;
-        public static final int activity_edit_contact_units_spinner=0x7f080006;
+        public static final int activity_edit_contact_unit_picker=0x7f080006;
         public static final int checkbox_list_item_checkbox=0x7f080009;
         public static final int contact_list_item_name_textview=0x7f08000b;
         public static final int contact_list_item_profile_imageview=0x7f08000a;
