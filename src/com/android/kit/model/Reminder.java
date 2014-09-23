@@ -10,7 +10,7 @@ import android.os.Parcelable;
 
 import com.google.common.collect.Sets;
 
-public class KitContact implements Parcelable {
+public class Reminder implements Parcelable {
 	private int id;
 	private String name;
 	private int reminderFrequency = 1;
@@ -18,11 +18,11 @@ public class KitContact implements Parcelable {
 	private DateTime nextReminderDate = DateTime.now().plusWeeks(1);
 	private Set<ContactType> contactTypes = Sets.newHashSet(ContactType.PHONE_CALL);
 	
-	public KitContact(int id)  {
+	public Reminder(int id)  {
 		this.id = id;
 	}
 	
-	public KitContact(Parcel in)  {
+	public Reminder(Parcel in)  {
 		this.id = in.readInt();
 		this.name = in.readString();
 		this.reminderFrequency = in.readInt();
@@ -43,19 +43,19 @@ public class KitContact implements Parcelable {
 		this.name = name;
 	}
 	
-	public int getReminderFrequency()  {
+	public int getFrequency()  {
 		return reminderFrequency;
 	}
 	
-	public void setReminderFrequency(int frequency)  {
+	public void setFrequency(int frequency)  {
 		this.reminderFrequency = frequency;
 	}
 	
-	public TimeUnit getReminderFrequencyUnit()  {
+	public TimeUnit getFrequencyUnit()  {
 		return reminderFrequencyUnit;
 	}
 	
-	public void setReminderFrequencyUnit(TimeUnit unit)  {
+	public void setFrequencyUnit(TimeUnit unit)  {
 		//TODO: Apache has a NullArgumentException.
 		if (unit == null)  {
 			throw new UnsupportedOperationException("Cannot set reminder frequency unit to null");
@@ -107,15 +107,15 @@ public class KitContact implements Parcelable {
 		dest.writeInt(ContactType.convertContactTypeCollection(contactTypes));
 	}
 	
-	public static final Parcelable.Creator<KitContact> CREATOR = new Parcelable.Creator<KitContact>()  {
+	public static final Parcelable.Creator<Reminder> CREATOR = new Parcelable.Creator<Reminder>()  {
 		@Override
-		public KitContact createFromParcel(Parcel source) {
-			return new KitContact(source);
+		public Reminder createFromParcel(Parcel source) {
+			return new Reminder(source);
 		}
 
 		@Override
-		public KitContact[] newArray(int size) {
-			return new KitContact[size];
+		public Reminder[] newArray(int size) {
+			return new Reminder[size];
 		} 
 	};
 			

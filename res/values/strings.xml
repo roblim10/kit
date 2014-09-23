@@ -2,13 +2,13 @@
 <resources>
 
     <string name="app_name">Kit</string>
-    <string name="add_contact">Add contact</string>
-    <string name="no_contacts_message">No contacts found.</string>
-    <string name="contact_list_item_imageview_desc">Profile image for contact</string>
-    <string name="activity_edit_contact_imageview_desc">Profile image for contact</string>
-    <string name="activity_edit_contact_remind_instructions">Remind me to contact this person every&#8230;</string>
-    <string name="activity_edit_contact_contact_type_instructions">Types of contact:</string>
-    <string name="title_activity_edit_contact">Edit contact</string>
+    <string name="add_reminder">Add reminder</string>
+    <string name="no_reminders_message">No reminders set.</string>
+    <string name="reminder_list_item_imageview_desc">Profile image for contact</string>
+    <string name="activity_edit_reminder_imageview_desc">Profile image for contact</string>
+    <string name="activity_edit_reminder_instructions">Remind me to contact this person every&#8230;</string>
+    <string name="activity_edit_reminder_contact_type_instructions">Types of contact:</string>
+    <string name="title_activity_edit_reminder">Edit reminder</string>
 
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>

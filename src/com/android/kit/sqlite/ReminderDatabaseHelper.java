@@ -5,8 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public class KitContactDatabaseHelper extends SQLiteOpenHelper {
-	public static final String TABLE_CONTACTS = "contacts";
+public class ReminderDatabaseHelper extends SQLiteOpenHelper {
+	public static final String TABLE_REMINDERS = "reminders";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_CONTACT_ID = "contact_id";
 	public static final String COLUMN_FREQUENCY = "frequency";
@@ -14,10 +14,10 @@ public class KitContactDatabaseHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_NEXT_REMINDER = "next_reminder_date";
 	public static final String COLUMN_CONTACT_TYPES = "contact_types";
 	
-	private static final String DATABASE_NAME = "contacts.db";
+	private static final String DATABASE_NAME = "reminders.db";
 	private static final int VERSION = 1;
 	
-	private static final String CREATE_DATABASE = "CREATE TABLE " + TABLE_CONTACTS + "("
+	private static final String CREATE_DATABASE = "CREATE TABLE " + TABLE_REMINDERS + "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 			+ COLUMN_CONTACT_ID + " INTEGER,"
 			+ COLUMN_FREQUENCY + " INTEGER,"
@@ -27,7 +27,7 @@ public class KitContactDatabaseHelper extends SQLiteOpenHelper {
 			+ ")";
 	
 	
-	public KitContactDatabaseHelper(Context context) {
+	public ReminderDatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, VERSION);
 	}
 
@@ -40,7 +40,7 @@ public class KitContactDatabaseHelper extends SQLiteOpenHelper {
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.i("KIT", String.format("Upgrading database %s from %d to %d", DATABASE_NAME, oldVersion, newVersion));
 		Log.w("KIT", "Upgrading not yet implemented.  Destroying all previous data.");
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CONTACTS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_REMINDERS);
 		onCreate(db);
 	}
 

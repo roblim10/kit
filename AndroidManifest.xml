@@ -14,7 +14,7 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Holo" >
-        <activity android:name="com.android.kit.ContactListActivity" >
+        <activity android:name="com.android.kit.ReminderListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,8 +22,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.android.kit.EditContactActivity"
-            android:label="@string/title_activity_edit_contact" >
+            android:name="com.android.kit.EditReminderActivity"
+            android:label="@string/title_activity_edit_reminder" >
         </activity>
     </application>
 

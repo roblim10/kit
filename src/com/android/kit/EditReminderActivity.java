@@ -18,13 +18,13 @@ import android.widget.TextView;
 
 import com.android.kit.model.CheckBoxListItemModel;
 import com.android.kit.model.ContactType;
-import com.android.kit.model.KitContact;
+import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class EditContactActivity extends Activity {
-	public final static String EXTRA_EDITED_CONTACT = "CONTACT_EDITED_CONTACT";
+public class EditReminderActivity extends Activity {
+	public final static String EXTRA_EDITED_REMINDER = "EDITED_REMINDER";
 	
 	private final static int MIN_NUMBER_PICKER_VALUE = 1;
 	private final static int MAX_NUMBER_PICKER_VALUE = 100;
@@ -34,7 +34,7 @@ public class EditContactActivity extends Activity {
 			new CheckBoxListItemModel<ContactType>(ContactType.SMS, ContactType.SMS.toString())
 		);
 		
-	private KitContact contactToEdit;
+	private Reminder reminderToEdit;
 	
 	private TextView nameTextView;
 	private NumberPicker numberPicker;
@@ -45,13 +45,13 @@ public class EditContactActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_edit_contact);
+		setContentView(R.layout.activity_edit_reminder);
 		
 		Intent fromIntent = getIntent();
-		contactToEdit = (KitContact)fromIntent.getParcelableExtra(ContactListActivity.KIT_CONTACT_TO_EDIT);
-		nameTextView = (TextView)findViewById(R.id.activity_edit_contact_name_textview);
-		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_contact_number_picker);
-		unitPicker = (NumberPicker)findViewById(R.id.activity_edit_contact_unit_picker);
+		reminderToEdit = (Reminder)fromIntent.getParcelableExtra(ReminderListActivity.REMINDER_TO_EDIT);
+		nameTextView = (TextView)findViewById(R.id.activity_edit_reminder_name_textview);
+		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_number_picker);
+		unitPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_unit_picker);
 		
 		setupNumberPicker();
 		setupUnitPicker();
@@ -82,15 +82,15 @@ public class EditContactActivity extends Activity {
 			options.add(item);	
 		}
 		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, options);
-		contactTypeListView = (ListView)findViewById(R.id.activity_edit_contact_contact_type_listview);
+		contactTypeListView = (ListView)findViewById(R.id.activity_edit_reminder_contact_type_listview);
 		contactTypeListView.setAdapter(contactTypeListAdapter);
 	}
 	
 	private void populateViews()  {
-		String name = contactToEdit.getName();
-		int frequency = contactToEdit.getReminderFrequency();
-		TimeUnit units = contactToEdit.getReminderFrequencyUnit();
-		Set<ContactType> checkedTypes = contactToEdit.getContactTypes();
+		String name = reminderToEdit.getName();
+		int frequency = reminderToEdit.getFrequency();
+		TimeUnit units = reminderToEdit.getFrequencyUnit();
+		Set<ContactType> checkedTypes = reminderToEdit.getContactTypes();
 		
 		nameTextView.setText(name);
 		numberPicker.setValue(frequency);
@@ -115,7 +115,7 @@ public class EditContactActivity extends Activity {
 			case R.id.action_save:
 				saveContact();
 				Intent intent = new Intent();
-				intent.putExtra(EXTRA_EDITED_CONTACT, contactToEdit);
+				intent.putExtra(EXTRA_EDITED_REMINDER, reminderToEdit);
 				setResult(RESULT_OK, intent);
 				finish();
 				return true;
@@ -134,10 +134,10 @@ public class EditContactActivity extends Activity {
 		//TODO: This isn't correct. Need to adjust so that we don't always add from current date/time.
 		DateTime nextReminderDate = calculateNextReminderDate(DateTime.now(), frequency, units);
 		Set<ContactType> contactTypes = Sets.newHashSet(contactTypeListAdapter.getSelectedItems());
-		contactToEdit.setReminderFrequency(frequency);
-		contactToEdit.setReminderFrequencyUnit(units);
-		contactToEdit.setNextReminderDate(nextReminderDate);
-		contactToEdit.setContactTypes(contactTypes);
+		reminderToEdit.setFrequency(frequency);
+		reminderToEdit.setFrequencyUnit(units);
+		reminderToEdit.setNextReminderDate(nextReminderDate);
+		reminderToEdit.setContactTypes(contactTypes);
 	}
 	
 	private DateTime calculateNextReminderDate(DateTime fromDate, int frequency, TimeUnit units)  {
