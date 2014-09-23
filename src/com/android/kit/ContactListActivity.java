@@ -41,6 +41,7 @@ public class ContactListActivity extends Activity {
 		getActionBar().setDisplayShowTitleEnabled(false);
 		
 		setupDatabase();
+		setupListAdapter();
 		setupListView();
 		setupAddContactButton();
 		
@@ -53,9 +54,23 @@ public class ContactListActivity extends Activity {
 		contactsDb.open();
 	}
 	
-	private void setupListView()  {
+	private void setupListAdapter()  {
+		//TODO: Is this efficient?  Should we do one query and then modify the contacts?
 		List<KitContact> contacts = contactsDb.readAllContacts();
-		listAdapter = new KitContactListAdapter(this, contacts);
+		for (KitContact contact : contacts)  {
+			Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, 
+					null, 
+					ContactsContract.CommonDataKinds.Identity._ID + " = ?", 
+					new String[] {Integer.toString(contact.getId())}, 
+					null);
+			cursor.moveToNext();
+			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME));
+			contact.setName(name);
+		}
+		listAdapter = new KitContactListAdapter(this,contacts);
+	}
+	
+	private void setupListView()  {
 		listView = (ListView)findViewById(R.id.activity_contact_list_listview);
 		listView.setAdapter(listAdapter);
 		listView.setOnItemClickListener(new OnItemClickListener()  {
@@ -114,8 +129,8 @@ public class ContactListActivity extends Activity {
 		Uri contactData = data.getData();
 		Cursor c = getContentResolver().query(contactData, null, null, null, null);
 		while(c.moveToNext())  {
-			int id = c.getInt(c.getColumnIndex("_id"));
-			String name = c.getString(c.getColumnIndex("display_name"));
+			int id = c.getInt(c.getColumnIndex(ContactsContract.CommonDataKinds.Identity._ID));
+			String name = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME));
 			newContact = new KitContact(id);
 			newContact.setName(name);
 			Log.i("KIT", "Created contact " + newContact.toString());
