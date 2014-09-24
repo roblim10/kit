@@ -5,6 +5,8 @@
     <string name="add_reminder">Add reminder</string>
     <string name="no_reminders_message">No reminders set.</string>
     <string name="reminder_list_item_imageview_desc">Profile image for contact</string>
+    <string name="reminder_list_item_reminder_frequency">Contact every %1$d %2$s</string>
+    <string name="reminder_list_item_next_reminder">Next reminder: %1$s</string>
     <string name="activity_edit_reminder_imageview_desc">Profile image for contact</string>
     <string name="activity_edit_reminder_instructions">Remind me to contact this person every&#8230;</string>
     <string name="activity_edit_reminder_contact_type_instructions">Types of contact:</string>

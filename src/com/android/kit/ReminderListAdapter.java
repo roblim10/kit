@@ -1,7 +1,10 @@
 package com.android.kit;
 
+import java.text.DateFormat;
 import java.util.List;
 import java.util.Map;
+
+import org.joda.time.DateTime;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -49,14 +52,18 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder>  {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 		
+		Context context = getContext();
 		Reminder currentReminder = getItem(position);
+		
 		viewHolder.nameTextView.setText(currentReminder.getName());
-		viewHolder.subTextView.setText("Test text");
-		viewHolder.reminderTextView.setText(currentReminder.getNextReminderDate() != null ?
-				//TODO: Get Android date/time format
-				//TODO: Better text
-				"Reminder set to contact by " + currentReminder.getNextReminderDate().toString("MM/dd/yyyy") :
-				"No reminder set");
+		String reminderFrequencyText = context.getString(R.string.reminder_list_item_reminder_frequency,
+				currentReminder.getFrequency(), 
+				currentReminder.getFrequencyUnit().toString());
+		viewHolder.subTextView.setText(reminderFrequencyText);
+		
+		String reminderText = context.getString(R.string.reminder_list_item_next_reminder,
+				getDateAsString(currentReminder.getNextReminderDate()));
+		viewHolder.reminderTextView.setText(reminderText);
 		
 		return convertView;
 	}
@@ -71,6 +78,11 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder>  {
 	
 	public Reminder getReminderByContactId(int id)  {
 		return reminderMap.get(id);
+	}
+	
+	private String getDateAsString(DateTime date)  {
+		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(getContext());
+		return dateFormat.format(date.toDate());
 	}
 	
 	//Recommended pattern for managing UI components in custom ListAdapters.  This caches the view
