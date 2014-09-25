@@ -11,15 +11,38 @@ import android.os.Parcelable;
 import com.google.common.collect.Sets;
 
 public class Reminder implements Parcelable {
+	private final static int DEFAULT_REMINDER_FREQUENCY = 1;
+	private final static TimeUnit DEFAULT_REMINDER_UNIT = TimeUnit.WEEKS;
+	private final static int DEFAULT_REMINDER_HOUR = 18;
+	private final static Set<ContactType> DEFAULT_CONTACT_TYPES = Sets.newHashSet(ContactType.PHONE_CALL);
+
+	private static DateTime getDefaultReminderDate()  {
+		DateTime defaultReminder = DateTime.now()
+				.withHourOfDay(DEFAULT_REMINDER_HOUR)
+				.withMinuteOfHour(0);
+		switch (DEFAULT_REMINDER_UNIT)  {
+			case DAYS: return defaultReminder.plusDays(DEFAULT_REMINDER_FREQUENCY);
+			case WEEKS: return defaultReminder.plusWeeks(DEFAULT_REMINDER_FREQUENCY);
+			case MONTHS: return defaultReminder.plusMonths(DEFAULT_REMINDER_FREQUENCY);
+			case YEARS: return defaultReminder.plusYears(DEFAULT_REMINDER_FREQUENCY);
+			default:
+				throw new UnsupportedOperationException("Error setting default reminder.  Unsupported TimeUnit: " + DEFAULT_REMINDER_UNIT);
+		}
+	}
+	
 	private int id;
 	private String name;
-	private int reminderFrequency = 1;
-	private TimeUnit reminderFrequencyUnit = TimeUnit.WEEKS;
-	private DateTime nextReminderDate = DateTime.now().plusWeeks(1);
-	private Set<ContactType> contactTypes = Sets.newHashSet(ContactType.PHONE_CALL);
+	private int reminderFrequency;
+	private TimeUnit reminderFrequencyUnit;
+	private DateTime nextReminderDate;
+	private Set<ContactType> contactTypes;
 	
 	public Reminder(int id)  {
 		this.id = id;
+		this.reminderFrequency = DEFAULT_REMINDER_FREQUENCY;
+		this.reminderFrequencyUnit = DEFAULT_REMINDER_UNIT;
+		this.nextReminderDate = Reminder.getDefaultReminderDate();
+		this.contactTypes = Sets.newHashSet(DEFAULT_CONTACT_TYPES);
 	}
 	
 	public Reminder(Parcel in)  {
@@ -91,7 +114,14 @@ public class Reminder implements Parcelable {
 				reminderFrequencyUnit != null ? reminderFrequencyUnit.toString() : "null", 
 				nextReminderDate != null ? nextReminderDate.toString() : "null");
 	}
-
+	
+	public void copy(Reminder reminder)  {
+		setFrequency(reminder.getFrequency());
+		setFrequencyUnit(reminder.getFrequencyUnit());
+		setNextReminderDate(reminder.getNextReminderDate());
+		setContactTypes(reminder.getContactTypes());
+	}
+	
 	@Override
 	public int describeContents() {
 		return 0;

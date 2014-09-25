@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -149,12 +150,8 @@ public class ReminderListActivity extends Activity {
 	private void handleEditReminderActivityRequest(Intent data)  {
 		Reminder editedReminder = data.getParcelableExtra(EditReminderActivity.EXTRA_EDITED_REMINDER);
 		Reminder existingReminder = listAdapter.getReminderByContactId(editedReminder.getId());
-		existingReminder.setFrequency(editedReminder.getFrequency());
-		existingReminder.setFrequencyUnit(editedReminder.getFrequencyUnit());
-		existingReminder.setNextReminderDate(editedReminder.getNextReminderDate());
-		existingReminder.setContactTypes(editedReminder.getContactTypes());
+		existingReminder.copy(editedReminder);
 		reminderDb.update(existingReminder);
-		
 	}
 	
 	private void refreshUi()  {

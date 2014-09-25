@@ -1,25 +1,36 @@
 package com.android.kit;
 
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.joda.time.DateTime;
 
 import android.app.Activity;
+import android.app.DatePickerDialog.OnDateSetListener;
+import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.android.kit.model.CheckBoxListItemModel;
 import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
+import com.android.kit.view.HyperlinkView;
+import com.android.kit.view.HyperlinkView.ClickableAction;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -36,9 +47,14 @@ public class EditReminderActivity extends Activity {
 		
 	private Reminder reminderToEdit;
 	
+	//Model for reminder TextViews.  We use Calendar because DatePicker/TimePicker index using Calendar.
+	private Calendar nextReminder;
+	
 	private TextView nameTextView;
 	private NumberPicker numberPicker;
 	private NumberPicker unitPicker;
+	private HyperlinkView reminderDateTextView;
+	private HyperlinkView reminderTimeTextView;
 	private CheckBoxListAdapter<ContactType> contactTypeListAdapter;
 	private ListView contactTypeListView;
 	
@@ -49,12 +65,17 @@ public class EditReminderActivity extends Activity {
 		
 		Intent fromIntent = getIntent();
 		reminderToEdit = (Reminder)fromIntent.getParcelableExtra(ReminderListActivity.REMINDER_TO_EDIT);
+		nextReminder = reminderToEdit.getNextReminderDate().toCalendar(Locale.getDefault()); 
+				
 		nameTextView = (TextView)findViewById(R.id.activity_edit_reminder_name_textview);
 		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_number_picker);
 		unitPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_unit_picker);
+		reminderDateTextView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_date_hyperlinkview);
+		reminderTimeTextView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_time_hyperlinkview);
 		
 		setupNumberPicker();
 		setupUnitPicker();
+		setupReminderTextViews();
 		setupContactTypeListView();
 		
 		populateViews();
@@ -76,6 +97,56 @@ public class EditReminderActivity extends Activity {
 		unitPicker.setDisplayedValues(timeUnitStrings);
 	}
 	
+	private void setupReminderTextViews()  {
+		reminderDateTextView.setClickableAction(new ClickableAction()  {
+			@Override
+			public void onClick(View widget) {
+				OnDateSetListener listener = createReminderDateSetListener();
+				int year = nextReminder.get(Calendar.YEAR);
+				int month = nextReminder.get(Calendar.MONTH);
+				int day = nextReminder.get(Calendar.DAY_OF_MONTH);
+				DatePickerFragment datePicker = new DatePickerFragment(listener, year, month, day);
+				datePicker.show(getFragmentManager(), "reminderDatePicker");
+			}
+		});
+		
+		reminderTimeTextView.setClickableAction(new ClickableAction()  {
+
+			@Override
+			public void onClick(View widget) {
+				OnTimeSetListener listener = createReminderTimeSetListener();
+				int hour = nextReminder.get(Calendar.HOUR_OF_DAY);
+				int minute = nextReminder.get(Calendar.MINUTE);
+				TimePickerFragment timePicker = new TimePickerFragment(listener, hour, minute);
+				timePicker.show(getFragmentManager(), "reminderTimePicker");				
+			}
+			
+		});
+//		reminderDateTextView.setMovementMethod(LinkMovementMethod.getInstance());
+//		reminderDateTextView.setOnClickListener(new OnClickListener()  {
+//			@Override
+//			public void onClick(View v) {
+//				OnDateSetListener listener = createReminderDateSetListener();
+//				int year = nextReminder.get(Calendar.YEAR);
+//				int month = nextReminder.get(Calendar.MONTH);
+//				int day = nextReminder.get(Calendar.DAY_OF_MONTH);
+//				DatePickerFragment datePicker = new DatePickerFragment(listener, year, month, day);
+//				datePicker.show(getFragmentManager(), "reminderDatePicker");
+//			}
+//		});
+//		
+//		reminderTimeTextView.setOnClickListener(new OnClickListener()  {
+//			@Override
+//			public void onClick(View v) {
+//				OnTimeSetListener listener = createReminderTimeSetListener();
+//				int hour = nextReminder.get(Calendar.HOUR_OF_DAY);
+//				int minute = nextReminder.get(Calendar.MINUTE);
+//				TimePickerFragment timePicker = new TimePickerFragment(listener, hour, minute);
+//				timePicker.show(getFragmentManager(), "reminderTimePicker");
+//			}
+//		});
+	}
+	
 	private void setupContactTypeListView()  {
 		List<CheckBoxListItemModel<ContactType>> options = Lists.newArrayList();
 		for (CheckBoxListItemModel<ContactType> item : TYPE_ITEMS)  {
@@ -95,11 +166,29 @@ public class EditReminderActivity extends Activity {
 		nameTextView.setText(name);
 		numberPicker.setValue(frequency);
 		unitPicker.setValue(units.getId());
+		refreshReminderDateTextView();
+		refreshReminderTimeTextView();
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
 			CheckBoxListItemModel<ContactType> model = contactTypeListAdapter.getItem(i);
 			boolean isChecked = checkedTypes.contains(model.getData());
 			model.setChecked(isChecked);
 		}
+	}
+	
+	private void refreshReminderDateTextView()  {
+		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(this);
+		String reminderDateText = dateFormat.format(nextReminder.getTime());
+		reminderDateTextView.setClickableText(reminderDateText);
+		
+		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
+		String reminderTimeText = timeFormat.format(nextReminder.getTime());
+		reminderTimeTextView.setClickableText(reminderTimeText);
+	}
+	
+	private void refreshReminderTimeTextView()  {
+		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
+		String reminderTimeText = timeFormat.format(nextReminder.getTime());
+		reminderTimeTextView.setClickableText(reminderTimeText);
 	}
 	
 	@Override
@@ -131,23 +220,41 @@ public class EditReminderActivity extends Activity {
 	private void saveContact()  {
 		int frequency = numberPicker.getValue();
 		TimeUnit units = TimeUnit.getTimeUnitFromId(unitPicker.getValue());
-		//TODO: This isn't correct. Need to adjust so that we don't always add from current date/time.
-		DateTime nextReminderDate = calculateNextReminderDate(DateTime.now(), frequency, units);
 		Set<ContactType> contactTypes = Sets.newHashSet(contactTypeListAdapter.getSelectedItems());
 		reminderToEdit.setFrequency(frequency);
 		reminderToEdit.setFrequencyUnit(units);
-		reminderToEdit.setNextReminderDate(nextReminderDate);
+		reminderToEdit.setNextReminderDate(new DateTime(nextReminder.getTimeInMillis()));
 		reminderToEdit.setContactTypes(contactTypes);
 	}
 	
-	private DateTime calculateNextReminderDate(DateTime fromDate, int frequency, TimeUnit units)  {
-		switch(units)  {
-			case DAYS: return fromDate.plusDays(frequency);
-			case WEEKS: return fromDate.plusWeeks(frequency);
-			case MONTHS: return fromDate.plusMonths(frequency);
-			case YEARS: return fromDate.plusYears(frequency);
-			default: throw new UnsupportedOperationException(
-					"Unknown time unit when calculating reminder date.  TimeUnit = " + units.toString());
-		}
+	private OnDateSetListener createReminderDateSetListener()  {
+		return new OnDateSetListener()  {
+			@Override
+			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+				//Convert to calendar first since DatePickers index according to Calendar, not DateTime
+				nextReminder = new GregorianCalendar(
+						year, 
+						monthOfYear, 
+						dayOfMonth, 
+						nextReminder.get(Calendar.HOUR_OF_DAY), 
+						nextReminder.get(Calendar.MINUTE));
+				refreshReminderDateTextView();
+			}
+		};
+	}
+	
+	private OnTimeSetListener createReminderTimeSetListener()  {
+		return new OnTimeSetListener()  {
+			@Override
+			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+				nextReminder = new GregorianCalendar(
+						nextReminder.get(Calendar.YEAR), 
+						nextReminder.get(Calendar.MONTH), 
+						nextReminder.get(Calendar.DAY_OF_MONTH),
+						hourOfDay, 
+						minute);
+				refreshReminderTimeTextView();
+			}
+		};
 	}
 }

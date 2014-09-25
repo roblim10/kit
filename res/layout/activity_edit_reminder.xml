@@ -44,9 +44,30 @@
 	       android:layout_margin="6dp"
 	       android:gravity="center_horizontal"
 	       android:descendantFocusability="blocksDescendants" />
-	   
     </LinearLayout>
     
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+	   
+	    <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content" 
+	        android:text="@string/activity_edit_reminder_next_reminder" />
+	    
+	    <com.android.kit.view.HyperlinkView
+	        android:id="@+id/activity_edit_reminder_reminder_date_hyperlinkview"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginStart="5dp" />
+	    
+	    <com.android.kit.view.HyperlinkView
+	        android:id="@+id/activity_edit_reminder_reminder_time_hyperlinkview"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_marginStart="5dp" />
+    </LinearLayout>
+       
     <TextView 
         android:id="@+id/activity_edit_reminder_contact_type_textview"
         android:layout_width="match_parent"
