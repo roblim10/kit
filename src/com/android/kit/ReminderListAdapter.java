@@ -10,14 +10,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.android.kit.model.Reminder;
 import com.google.common.collect.Maps;
 
 
-public class ReminderListAdapter extends ArrayAdapter<Reminder>  {
+public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 	
 	private Map<Integer, Reminder> reminderMap;
 	
@@ -65,6 +64,8 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder>  {
 				getDateAsString(currentReminder.getNextReminderDate()));
 		viewHolder.reminderTextView.setText(reminderText);
 		
+		int backgroundRes = isSelected(position) ? android.R.color.holo_green_light : android.R.color.transparent;
+		convertView.setBackground(context.getResources().getDrawable(backgroundRes));
 		return convertView;
 	}
 	
@@ -73,8 +74,6 @@ public class ReminderListAdapter extends ArrayAdapter<Reminder>  {
 		super.add(reminder);
 		reminderMap.put(reminder.getId(), reminder);
 	}
-	
-	//TODO:Add other add/remove methods here.
 	
 	public Reminder getReminderByContactId(int id)  {
 		return reminderMap.get(id);

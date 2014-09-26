@@ -3,10 +3,7 @@ package com.android.kit;
 import java.util.List;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.util.SparseBooleanArray;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 
 import com.google.common.collect.Lists;
@@ -32,7 +29,7 @@ public class SelectableListAdapter<T> extends ArrayAdapter<T> {
         notifyDataSetChanged();
     }
 
-    public void clearSelection(int position) {
+    public void clearSelection() {
         selection.clear();
         notifyDataSetChanged();
     }
@@ -52,13 +49,9 @@ public class SelectableListAdapter<T> extends ArrayAdapter<T> {
 		return selectedItems;
     }
     
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View v = super.getView(position, convertView, parent);
-        Resources res = getContext().getResources();
-        v.setBackgroundColor(isSelected(position) ?
-        		res.getColor(android.R.color.holo_blue_light) :
-        		res.getColor(android.R.color.background_light));
-        return v;
+    public int getSelectedItemsCount()  {
+    	return selection.size();
     }
+    
+    
 }

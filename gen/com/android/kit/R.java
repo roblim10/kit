@@ -24,10 +24,12 @@ public final class R {
     public static final class drawable {
         public static final int alarm_clock=0x7f020000;
         public static final int ic_launcher=0x7f020001;
-        public static final int toucan=0x7f020002;
+        public static final int ic_menu_delete=0x7f020002;
+        public static final int toucan=0x7f020003;
     }
     public static final class id {
         public static final int action_cancel=0x7f080010;
+        public static final int action_delete=0x7f080012;
         public static final int action_save=0x7f080011;
         public static final int activity_contact_list_no_reminders_textview=0x7f08000a;
         public static final int activity_edit_reminder_contact_type_listview=0x7f080007;
@@ -54,23 +56,26 @@ public final class R {
     }
     public static final class menu {
         public static final int activity_edit_contact_menu=0x7f070000;
+        public static final int activity_reminder_list_item_menu=0x7f070001;
     }
     public static final class string {
-        public static final int action_cancel=0x7f05000c;
-        public static final int action_save=0x7f05000b;
-        public static final int activity_edit_reminder_contact_type_instructions=0x7f050009;
-        public static final int activity_edit_reminder_imageview_desc=0x7f050006;
-        public static final int activity_edit_reminder_instructions=0x7f050007;
-        public static final int activity_edit_reminder_next_reminder=0x7f050008;
+        public static final int action_cancel=0x7f05000e;
+        public static final int action_delete=0x7f05000d;
+        public static final int action_save=0x7f05000c;
+        public static final int activity_edit_reminder_contact_type_instructions=0x7f05000a;
+        public static final int activity_edit_reminder_imageview_desc=0x7f050007;
+        public static final int activity_edit_reminder_instructions=0x7f050008;
+        public static final int activity_edit_reminder_next_reminder=0x7f050009;
+        public static final int activity_reminder_list_cab_title=0x7f050006;
         public static final int add_reminder=0x7f050001;
         public static final int app_name=0x7f050000;
-        public static final int contact_type_phone_call=0x7f05000d;
-        public static final int contact_type_text_message=0x7f05000e;
+        public static final int contact_type_phone_call=0x7f05000f;
+        public static final int contact_type_text_message=0x7f050010;
         public static final int no_reminders_message=0x7f050002;
         public static final int reminder_list_item_imageview_desc=0x7f050003;
         public static final int reminder_list_item_next_reminder=0x7f050005;
         public static final int reminder_list_item_reminder_frequency=0x7f050004;
-        public static final int title_activity_edit_reminder=0x7f05000a;
+        public static final int title_activity_edit_reminder=0x7f05000b;
     }
     public static final class style {
         /** 

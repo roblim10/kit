@@ -7,6 +7,7 @@
     <string name="reminder_list_item_imageview_desc">Profile image for contact</string>
     <string name="reminder_list_item_reminder_frequency">Contact every %1$d %2$s</string>
     <string name="reminder_list_item_next_reminder">Next reminder: %1$s</string>
+    <string name="activity_reminder_list_cab_title">%1$d reminder(s) selected</string>
     <string name="activity_edit_reminder_imageview_desc">Profile image for contact</string>
     <string name="activity_edit_reminder_instructions">Remind me to contact this person every&#8230;</string>
     <string name="activity_edit_reminder_next_reminder">Next reminder:</string>
@@ -14,6 +15,7 @@
     <string name="title_activity_edit_reminder">Edit reminder</string>
 
     <string name="action_save">Save</string>
+    <string name="action_delete">Delete</string>
     <string name="action_cancel">Cancel</string>
     
     <string name="contact_type_phone_call">Phone call</string>
