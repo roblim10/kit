@@ -53,8 +53,8 @@ public class EditReminderActivity extends Activity {
 	private TextView nameTextView;
 	private NumberPicker numberPicker;
 	private NumberPicker unitPicker;
-	private HyperlinkView reminderDateTextView;
-	private HyperlinkView reminderTimeTextView;
+	private HyperlinkView reminderDateHyperlinkView;
+	private HyperlinkView reminderTimeHyperlinkView;
 	private CheckBoxListAdapter<ContactType> contactTypeListAdapter;
 	private ListView contactTypeListView;
 	
@@ -70,8 +70,8 @@ public class EditReminderActivity extends Activity {
 		nameTextView = (TextView)findViewById(R.id.activity_edit_reminder_name_textview);
 		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_number_picker);
 		unitPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_unit_picker);
-		reminderDateTextView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_date_hyperlinkview);
-		reminderTimeTextView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_time_hyperlinkview);
+		reminderDateHyperlinkView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_date_hyperlinkview);
+		reminderTimeHyperlinkView = (HyperlinkView)findViewById(R.id.activity_edit_reminder_reminder_time_hyperlinkview);
 		
 		setupNumberPicker();
 		setupUnitPicker();
@@ -98,7 +98,7 @@ public class EditReminderActivity extends Activity {
 	}
 	
 	private void setupReminderTextViews()  {
-		reminderDateTextView.setClickableAction(new ClickableAction()  {
+		reminderDateHyperlinkView.setClickableAction(new ClickableAction()  {
 			@Override
 			public void onClick(View widget) {
 				OnDateSetListener listener = createReminderDateSetListener();
@@ -110,8 +110,7 @@ public class EditReminderActivity extends Activity {
 			}
 		});
 		
-		reminderTimeTextView.setClickableAction(new ClickableAction()  {
-
+		reminderTimeHyperlinkView.setClickableAction(new ClickableAction()  {
 			@Override
 			public void onClick(View widget) {
 				OnTimeSetListener listener = createReminderTimeSetListener();
@@ -122,29 +121,6 @@ public class EditReminderActivity extends Activity {
 			}
 			
 		});
-//		reminderDateTextView.setMovementMethod(LinkMovementMethod.getInstance());
-//		reminderDateTextView.setOnClickListener(new OnClickListener()  {
-//			@Override
-//			public void onClick(View v) {
-//				OnDateSetListener listener = createReminderDateSetListener();
-//				int year = nextReminder.get(Calendar.YEAR);
-//				int month = nextReminder.get(Calendar.MONTH);
-//				int day = nextReminder.get(Calendar.DAY_OF_MONTH);
-//				DatePickerFragment datePicker = new DatePickerFragment(listener, year, month, day);
-//				datePicker.show(getFragmentManager(), "reminderDatePicker");
-//			}
-//		});
-//		
-//		reminderTimeTextView.setOnClickListener(new OnClickListener()  {
-//			@Override
-//			public void onClick(View v) {
-//				OnTimeSetListener listener = createReminderTimeSetListener();
-//				int hour = nextReminder.get(Calendar.HOUR_OF_DAY);
-//				int minute = nextReminder.get(Calendar.MINUTE);
-//				TimePickerFragment timePicker = new TimePickerFragment(listener, hour, minute);
-//				timePicker.show(getFragmentManager(), "reminderTimePicker");
-//			}
-//		});
 	}
 	
 	private void setupContactTypeListView()  {
@@ -178,17 +154,17 @@ public class EditReminderActivity extends Activity {
 	private void refreshReminderDateTextView()  {
 		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(this);
 		String reminderDateText = dateFormat.format(nextReminder.getTime());
-		reminderDateTextView.setClickableText(reminderDateText);
+		reminderDateHyperlinkView.setClickableText(reminderDateText);
 		
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
 		String reminderTimeText = timeFormat.format(nextReminder.getTime());
-		reminderTimeTextView.setClickableText(reminderTimeText);
+		reminderTimeHyperlinkView.setClickableText(reminderTimeText);
 	}
 	
 	private void refreshReminderTimeTextView()  {
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
 		String reminderTimeText = timeFormat.format(nextReminder.getTime());
-		reminderTimeTextView.setClickableText(reminderTimeText);
+		reminderTimeHyperlinkView.setClickableText(reminderTimeText);
 	}
 	
 	@Override
