@@ -4,7 +4,6 @@ package com.android.kit;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -25,13 +24,11 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.android.kit.model.CheckBoxListItemModel;
 import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
 import com.android.kit.view.HyperlinkView;
 import com.android.kit.view.HyperlinkView.ClickableAction;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class EditReminderActivity extends Activity {
@@ -40,10 +37,10 @@ public class EditReminderActivity extends Activity {
 	private final static int MIN_NUMBER_PICKER_VALUE = 1;
 	private final static int MAX_NUMBER_PICKER_VALUE = 100;
 	
-	private final static List<CheckBoxListItemModel<ContactType>> TYPE_ITEMS = Lists.newArrayList(
-			new CheckBoxListItemModel<ContactType>(ContactType.PHONE_CALL, ContactType.PHONE_CALL.toString()),
-			new CheckBoxListItemModel<ContactType>(ContactType.SMS, ContactType.SMS.toString())
-		);
+	private final static ContactType[] TYPE_ITEMS = {
+		ContactType.PHONE_CALL,
+		ContactType.SMS
+	};
 		
 	private Reminder reminderToEdit;
 	
@@ -124,11 +121,7 @@ public class EditReminderActivity extends Activity {
 	}
 	
 	private void setupContactTypeListView()  {
-		List<CheckBoxListItemModel<ContactType>> options = Lists.newArrayList();
-		for (CheckBoxListItemModel<ContactType> item : TYPE_ITEMS)  {
-			options.add(item);	
-		}
-		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, options);
+		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, TYPE_ITEMS);
 		contactTypeListView = (ListView)findViewById(R.id.activity_edit_reminder_contact_type_listview);
 		contactTypeListView.setAdapter(contactTypeListAdapter);
 	}
@@ -145,9 +138,9 @@ public class EditReminderActivity extends Activity {
 		refreshReminderDateTextView();
 		refreshReminderTimeTextView();
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
-			CheckBoxListItemModel<ContactType> model = contactTypeListAdapter.getItem(i);
-			boolean isChecked = checkedTypes.contains(model.getData());
-			model.setChecked(isChecked);
+			ContactType contactType = contactTypeListAdapter.getItem(i);
+			boolean isChecked = checkedTypes.contains(contactType);
+			contactTypeListAdapter.setSelected(i, isChecked);
 		}
 	}
 	
