@@ -1,5 +1,7 @@
 package com.android.kit.sqlite;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -10,6 +12,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.text.TextUtils;
 
 import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
@@ -60,21 +63,32 @@ public class ReminderDatabase {
 		return contacts;
 	}
 	
-	public void insert(Reminder contact) throws SQLException {
-		ContentValues values = convertKitContactToContentValues(contact);
+	public void insert(Reminder reminder) throws SQLException {
+		ContentValues values = convertReminderToContentValues(reminder);
 		database.insertOrThrow(ReminderDatabaseHelper.TABLE_REMINDERS, null, values);
 	}
 	
-	public void update(Reminder contact)  {
-		ContentValues values = convertKitContactToContentValues(contact);
+	public void update(Reminder reminder)  {
+		ContentValues values = convertReminderToContentValues(reminder);
 		database.update(ReminderDatabaseHelper.TABLE_REMINDERS,
 				values,
 				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " = ?",
-				new String[] {Integer.toString(contact.getId())});
+				new String[] {Integer.toString(reminder.getId())});
 		//TODO: Error check
 	}
 	
-	private ContentValues convertKitContactToContentValues(Reminder contact)  {
+	public void delete(Collection<Reminder> reminders)  {
+		Collection<String> ids = new HashSet<String>();
+		for (Reminder r : reminders)  {
+			ids.add(Integer.toString(r.getId()));
+		}
+		
+		database.delete(ReminderDatabaseHelper.TABLE_REMINDERS,
+				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " IN (?)",
+				new String[] {TextUtils.join(",", ids)});
+	}
+	
+	private ContentValues convertReminderToContentValues(Reminder contact)  {
 		ContentValues values = new ContentValues();
 		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_ID, contact.getId());
 		values.put(ReminderDatabaseHelper.COLUMN_FREQUENCY, contact.getFrequency());

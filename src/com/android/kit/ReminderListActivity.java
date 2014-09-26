@@ -1,6 +1,7 @@
 package com.android.kit;
 
 
+import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
@@ -103,8 +104,15 @@ public class ReminderListActivity extends Activity {
 
 			@Override
 			public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-				//TODO: Delete here.
-				return true;
+				switch (item.getItemId())  {
+					case R.id.action_delete:
+						List<Reminder> toDelete = listAdapter.getSelectedItems();
+						deleteReminders(toDelete);
+						mode.finish();
+						return false;
+					default:
+						throw new UnsupportedOperationException("Operation not supported");
+				}
 			}
 
 			@Override
@@ -190,6 +198,13 @@ public class ReminderListActivity extends Activity {
 		Reminder existingReminder = listAdapter.getReminderByContactId(editedReminder.getId());
 		existingReminder.copy(editedReminder);
 		reminderDb.update(existingReminder);
+	}
+	
+	private void deleteReminders(Collection<Reminder> toDelete)  {
+		for (Reminder r : toDelete)  {
+			listAdapter.remove(r);
+		}
+		reminderDb.delete(toDelete);
 	}
 	
 	private void refreshUi()  {
