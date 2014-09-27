@@ -17,7 +17,6 @@
         <activity android:name="com.android.kit.ReminderListActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,6 +24,15 @@
             android:name="com.android.kit.EditReminderActivity"
             android:label="@string/title_activity_edit_reminder" >
         </activity>
-    </application>
+        
+        <service android:name="com.android.kit.service.AlarmService" />
+        
+        <receiver android:name="com.android.kit.service.CreateRemindersOnBootReceiverReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.android.kit.service.ReminderAlarmReceiver" />
+	</application>
 
 </manifest>

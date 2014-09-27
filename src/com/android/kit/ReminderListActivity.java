@@ -53,15 +53,20 @@ public class ReminderListActivity extends Activity {
 		
 		noRemindersTextView = (TextView)findViewById(R.id.activity_contact_list_no_reminders_textview);
 		updateViewVisibility();
+		
+		//Just a test.  Uncomment to test reboot.
+		//CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
+		//test.onReceive(this, null);
 	}
 	
 	private void setupDatabase()  {
-		reminderDb = new ReminderDatabase(this);
+		reminderDb = ReminderDatabase.getInstance(this);
 		Log.d("KIT", "Opening reminders DB");
 		reminderDb.open();
 	}
 	
 	private void setupListAdapter()  {
+		//TODO: Switch to CursorAdapter
 		//TODO: Is this efficient?  Should we do one query and then modify the reminders?
 		List<Reminder> reminders = reminderDb.readAllReminders();
 		for (Reminder reminder : reminders)  {
@@ -73,6 +78,7 @@ public class ReminderListActivity extends Activity {
 			cursor.moveToNext();
 			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME));
 			reminder.setName(name);
+			cursor.close();
 		}
 		listAdapter = new ReminderListAdapter(this,reminders);
 	}

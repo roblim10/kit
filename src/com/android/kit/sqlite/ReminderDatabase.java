@@ -31,7 +31,17 @@ public class ReminderDatabase {
 	private ReminderDatabaseHelper dbHelper;
 	private SQLiteDatabase database;
 	
-	public ReminderDatabase(Context context)  {
+	private static ReminderDatabase db;
+	
+	public static ReminderDatabase getInstance(Context context)  {
+		if (db == null)  {
+			db = new ReminderDatabase(context.getApplicationContext());
+			db.open();
+		}
+		return db;
+	}
+	
+	private ReminderDatabase(Context context)  {
 		dbHelper = new ReminderDatabaseHelper(context);
 	}
 	
