@@ -24,7 +24,7 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		super(context, R.layout.reminder_list_item, reminderList);
 		reminderMap = Maps.newHashMap();
 		for (Reminder reminder : reminderList)  {
-			reminderMap.put(reminder.getId(), reminder);
+			reminderMap.put(reminder.getContactId(), reminder);
 		}
 	}
 
@@ -72,7 +72,7 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 	@Override
 	public void add(Reminder reminder)  {
 		super.add(reminder);
-		reminderMap.put(reminder.getId(), reminder);
+		reminderMap.put(reminder.getContactId(), reminder);
 	}
 	
 	public Reminder getReminderByContactId(int id)  {

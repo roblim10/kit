@@ -54,7 +54,7 @@ public class Reminder implements Parcelable {
 		this.contactTypes = ContactType.convertContactTypeValue(in.readInt());
 	}
 	
-	public int getId()  {
+	public int getContactId()  {
 		return id;
 	}
 	

@@ -9,6 +9,7 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
 	public static final String TABLE_REMINDERS = "reminders";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_CONTACT_ID = "contact_id";
+	public static final String COLUMN_CONTACT_NAME = "contact_name";
 	public static final String COLUMN_FREQUENCY = "frequency";
 	public static final String COLUMN_TIME_UNIT = "time_unit";
 	public static final String COLUMN_NEXT_REMINDER = "next_reminder_date";
@@ -20,6 +21,7 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
 	private static final String CREATE_DATABASE = "CREATE TABLE " + TABLE_REMINDERS + "("
 			+ COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
 			+ COLUMN_CONTACT_ID + " INTEGER,"
+			+ COLUMN_CONTACT_NAME + " TEXT,"
 			+ COLUMN_FREQUENCY + " INTEGER,"
 			+ COLUMN_TIME_UNIT + " INTEGER,"
 			+ COLUMN_NEXT_REMINDER + " INTEGER,"

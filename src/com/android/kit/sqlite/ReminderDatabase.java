@@ -1,18 +1,17 @@
 package com.android.kit.sqlite;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 
 import org.joda.time.DateTime;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.text.TextUtils;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
@@ -20,14 +19,19 @@ import com.android.kit.model.TimeUnit;
 import com.google.common.collect.Lists;
 
 public class ReminderDatabase {
+	public final static String ACTION_REMINDER_DB_UPDATED = "com.android.kit.sqlite.ACTION_REMINDER_DB_UPDATED"; 
+	public final static String EXTRA_REMINDER = "EXTRA_REMINDER";
+	
 	private final static String[] ALL_COLUMNS = {
 		ReminderDatabaseHelper.COLUMN_CONTACT_ID,
+		ReminderDatabaseHelper.COLUMN_CONTACT_NAME,
 		ReminderDatabaseHelper.COLUMN_FREQUENCY,
 		ReminderDatabaseHelper.COLUMN_TIME_UNIT,
 		ReminderDatabaseHelper.COLUMN_NEXT_REMINDER,
 		ReminderDatabaseHelper.COLUMN_CONTACT_TYPES
 	};
 	
+	private Context context;
 	private ReminderDatabaseHelper dbHelper;
 	private SQLiteDatabase database;
 	
@@ -43,6 +47,7 @@ public class ReminderDatabase {
 	
 	private ReminderDatabase(Context context)  {
 		dbHelper = new ReminderDatabaseHelper(context);
+		this.context = context;
 	}
 	
 	public void open() throws SQLiteException  {
@@ -59,15 +64,13 @@ public class ReminderDatabase {
 		List<Reminder> contacts = Lists.newArrayList();
 		Cursor cursor = database.query(ReminderDatabaseHelper.TABLE_REMINDERS, ALL_COLUMNS, 
 				null, null, null, null, null);
-		cursor.moveToFirst();
 		while (cursor.moveToNext())  {
-			//TODO: We are not getting the contact's name here.  Should we store it here or should we read it from
-			//the native Contacts database?
 			Reminder contact = new Reminder(cursor.getInt(0));
-			contact.setFrequency(cursor.getInt(1));
-			contact.setFrequencyUnit(TimeUnit.getTimeUnitFromId(cursor.getInt(2)));
-			contact.setNextReminderDate(new DateTime(cursor.getLong(3)));
-			contact.setContactTypes(ContactType.convertContactTypeValue(cursor.getInt(4)));
+			contact.setName(cursor.getString(1));
+			contact.setFrequency(cursor.getInt(2));
+			contact.setFrequencyUnit(TimeUnit.getTimeUnitFromId(cursor.getInt(3)));
+			contact.setNextReminderDate(new DateTime(cursor.getLong(4)));
+			contact.setContactTypes(ContactType.convertContactTypeValue(cursor.getInt(5)));
 			contacts.add(contact);
 		}
 		return contacts;
@@ -76,6 +79,7 @@ public class ReminderDatabase {
 	public void insert(Reminder reminder) throws SQLException {
 		ContentValues values = convertReminderToContentValues(reminder);
 		database.insertOrThrow(ReminderDatabaseHelper.TABLE_REMINDERS, null, values);
+		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, reminder);
 	}
 	
 	public void update(Reminder reminder)  {
@@ -83,28 +87,34 @@ public class ReminderDatabase {
 		database.update(ReminderDatabaseHelper.TABLE_REMINDERS,
 				values,
 				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " = ?",
-				new String[] {Integer.toString(reminder.getId())});
+				new String[] {Integer.toString(reminder.getContactId())});
 		//TODO: Error check
+		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, reminder);
 	}
 	
-	public void delete(Collection<Reminder> reminders)  {
-		Collection<String> ids = new HashSet<String>();
-		for (Reminder r : reminders)  {
-			ids.add(Integer.toString(r.getId()));
-		}
-		
+	public void delete(Reminder reminder)  {
 		database.delete(ReminderDatabaseHelper.TABLE_REMINDERS,
-				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " IN (?)",
-				new String[] {TextUtils.join(",", ids)});
+				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " = ?",
+				new String[] { Integer.toString(reminder.getContactId()) });
+		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, null);
 	}
 	
 	private ContentValues convertReminderToContentValues(Reminder contact)  {
 		ContentValues values = new ContentValues();
-		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_ID, contact.getId());
+		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_ID, contact.getContactId());
+		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_NAME, contact.getName());
 		values.put(ReminderDatabaseHelper.COLUMN_FREQUENCY, contact.getFrequency());
 		values.put(ReminderDatabaseHelper.COLUMN_TIME_UNIT, contact.getFrequencyUnit().getId());
 		values.put(ReminderDatabaseHelper.COLUMN_NEXT_REMINDER, contact.getNextReminderDate().getMillis());
 		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_TYPES, ContactType.convertContactTypeCollection(contact.getContactTypes()));
 		return values;
+	}
+	
+	//TODO: Currently always sending ACTION_REMINDER_DB_UPDATED.  Possible to be more efficient to
+	//specify which rows were updated.
+	private void sendDbChangedBroadcast(String action, Reminder reminder)  {
+		Intent broadcastIntent = new Intent(action);
+		broadcastIntent.putExtra(EXTRA_REMINDER, reminder);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(broadcastIntent);
 	}
 }

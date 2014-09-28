@@ -1,15 +1,21 @@
 package com.android.kit;
 
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -25,6 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.kit.model.Reminder;
+import com.android.kit.service.CreateRemindersOnBootReceiver;
 import com.android.kit.sqlite.ReminderDatabase;
 
 public class ReminderListActivity extends Activity {
@@ -50,37 +57,22 @@ public class ReminderListActivity extends Activity {
 		setupListAdapter();
 		setupListView();
 		setupAddContactButton();
-		
 		noRemindersTextView = (TextView)findViewById(R.id.activity_contact_list_no_reminders_textview);
-		updateViewVisibility();
+		setupDatabaseSync();
+		refreshUi();
 		
 		//Just a test.  Uncomment to test reboot.
-		//CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
-		//test.onReceive(this, null);
+		CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
+		test.onReceive(this, null);
 	}
 	
 	private void setupDatabase()  {
 		reminderDb = ReminderDatabase.getInstance(this);
-		Log.d("KIT", "Opening reminders DB");
-		reminderDb.open();
 	}
 	
 	private void setupListAdapter()  {
-		//TODO: Switch to CursorAdapter
-		//TODO: Is this efficient?  Should we do one query and then modify the reminders?
-		List<Reminder> reminders = reminderDb.readAllReminders();
-		for (Reminder reminder : reminders)  {
-			Cursor cursor = getContentResolver().query(ContactsContract.Contacts.CONTENT_URI, 
-					null, 
-					ContactsContract.CommonDataKinds.Identity._ID + " = ?", 
-					new String[] {Integer.toString(reminder.getId())}, 
-					null);
-			cursor.moveToNext();
-			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME));
-			reminder.setName(name);
-			cursor.close();
-		}
-		listAdapter = new ReminderListAdapter(this,reminders);
+//		//TODO: Switch to CursorAdapter
+		listAdapter = new ReminderListAdapter(this, new ArrayList<Reminder>());
 	}
 	
 	private void setupListView()  {
@@ -147,11 +139,13 @@ public class ReminderListActivity extends Activity {
 		});
 	}
 	
-	@Override
-	protected void onDestroy()  {
-		Log.d("KIT", "Closing reminders database");
-		reminderDb.close();
-		super.onDestroy();
+	private void setupDatabaseSync()  {
+		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				refreshUi();
+			}
+		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
 	}
 	
 	@Override
@@ -166,13 +160,11 @@ public class ReminderListActivity extends Activity {
 			case ADD_REMINDER_REQUEST:
 				if (resultCode == Activity.RESULT_OK)  {
 					handleAddReminderActivityRequest(data);
-					refreshUi();
 				}
 				break;
 			case EDIT_REMINDER_REQUEST:
 				if (resultCode == Activity.RESULT_OK)  {
 					handleEditReminderActivityRequest(data);
-					refreshUi();
 				}
 				break;
 		}
@@ -195,27 +187,36 @@ public class ReminderListActivity extends Activity {
 	
 	private void handleAddReminderActivityRequest(Intent data)  {
 		Reminder editedContact = data.getParcelableExtra(EditReminderActivity.EXTRA_EDITED_REMINDER);
-		listAdapter.add(editedContact);
 		reminderDb.insert(editedContact);
 	}
 	
 	private void handleEditReminderActivityRequest(Intent data)  {
 		Reminder editedReminder = data.getParcelableExtra(EditReminderActivity.EXTRA_EDITED_REMINDER);
-		Reminder existingReminder = listAdapter.getReminderByContactId(editedReminder.getId());
-		existingReminder.copy(editedReminder);
-		reminderDb.update(existingReminder);
+		reminderDb.update(editedReminder);
 	}
 	
 	private void deleteReminders(Collection<Reminder> toDelete)  {
-		for (Reminder r : toDelete)  {
-			listAdapter.remove(r);
+		for (Reminder reminder : toDelete)  {
+			reminderDb.delete(reminder);
 		}
-		reminderDb.delete(toDelete);
 	}
 	
 	private void refreshUi()  {
-		listAdapter.notifyDataSetChanged();
-		updateViewVisibility();
+		//TODO: Create a loading spinner
+		new AsyncTask<Void,Void,List<Reminder>>()  {
+			@Override
+			protected List<Reminder> doInBackground(Void... params) {
+				return reminderDb.readAllReminders();
+			}
+			
+			@Override
+			protected void onPostExecute(List<Reminder> result)  {
+				listAdapter.clear();
+				listAdapter.addAll(result);
+				updateViewVisibility();
+				
+			}
+		}.execute();
 	}
 	
 	private void updateViewVisibility()  {
