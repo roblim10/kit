@@ -24,14 +24,16 @@ public final class R {
     public static final class drawable {
         public static final int alarm_clock=0x7f020000;
         public static final int ic_launcher=0x7f020001;
-        public static final int ic_menu_delete=0x7f020002;
-        public static final int toucan=0x7f020003;
+        public static final int ic_menu_add=0x7f020002;
+        public static final int ic_menu_delete=0x7f020003;
+        public static final int toucan=0x7f020004;
     }
     public static final class id {
-        public static final int action_cancel=0x7f080010;
-        public static final int action_delete=0x7f080012;
-        public static final int action_save=0x7f080011;
-        public static final int activity_contact_list_no_reminders_textview=0x7f08000a;
+        public static final int action_add_reminder=0x7f080012;
+        public static final int action_cancel=0x7f08000f;
+        public static final int action_delete=0x7f080011;
+        public static final int action_save=0x7f080010;
+        public static final int activity_contact_list_no_reminders_textview=0x7f080009;
         public static final int activity_edit_reminder_contact_type_listview=0x7f080007;
         public static final int activity_edit_reminder_contact_type_textview=0x7f080006;
         public static final int activity_edit_reminder_instructions_textview=0x7f080001;
@@ -40,13 +42,12 @@ public final class R {
         public static final int activity_edit_reminder_reminder_date_hyperlinkview=0x7f080004;
         public static final int activity_edit_reminder_reminder_time_hyperlinkview=0x7f080005;
         public static final int activity_edit_reminder_unit_picker=0x7f080003;
-        public static final int activity_reminder_list_add_button=0x7f080008;
-        public static final int activity_reminder_listview=0x7f080009;
-        public static final int checkbox_list_item_checkbox=0x7f08000b;
-        public static final int reminder_list_item_date_textview=0x7f08000f;
-        public static final int reminder_list_item_name_textview=0x7f08000d;
-        public static final int reminder_list_item_profile_imageview=0x7f08000c;
-        public static final int reminder_list_item_subtitle_textview=0x7f08000e;
+        public static final int activity_reminder_listview=0x7f080008;
+        public static final int checkbox_list_item_checkbox=0x7f08000a;
+        public static final int reminder_list_item_date_textview=0x7f08000e;
+        public static final int reminder_list_item_name_textview=0x7f08000c;
+        public static final int reminder_list_item_profile_imageview=0x7f08000b;
+        public static final int reminder_list_item_subtitle_textview=0x7f08000d;
     }
     public static final class layout {
         public static final int activity_edit_reminder=0x7f030000;
@@ -57,6 +58,7 @@ public final class R {
     public static final class menu {
         public static final int activity_edit_contact_menu=0x7f070000;
         public static final int activity_reminder_list_item_menu=0x7f070001;
+        public static final int activity_reminder_list_menu=0x7f070002;
     }
     public static final class string {
         public static final int action_cancel=0x7f05000e;

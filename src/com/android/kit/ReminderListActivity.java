@@ -56,7 +56,7 @@ public class ReminderListActivity extends Activity {
 		setupDatabase();
 		setupListAdapter();
 		setupListView();
-		setupAddContactButton();
+//		setupAddContactButton();
 		noRemindersTextView = (TextView)findViewById(R.id.activity_contact_list_no_reminders_textview);
 		setupDatabaseSync();
 		refreshUi();
@@ -128,17 +128,6 @@ public class ReminderListActivity extends Activity {
 		});
 	}
 	
-	private void setupAddContactButton()  {
-		Button addReminderButton = (Button)findViewById(R.id.activity_reminder_list_add_button);
-		addReminderButton.setOnClickListener(new OnClickListener()  {
-			@Override
-			public void onClick(View v) {
-				Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
-				startActivityForResult(contactPickerIntent, PICK_CONTACT_REQUEST);
-			}
-		});
-	}
-	
 	private void setupDatabaseSync()  {
 		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
 			@Override
@@ -146,6 +135,25 @@ public class ReminderListActivity extends Activity {
 				refreshUi();
 			}
 		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu)  {
+		MenuInflater menuInflater = getMenuInflater();
+		menuInflater.inflate(R.menu.activity_reminder_list_menu, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem menuItem)  {
+		switch (menuItem.getItemId())  {
+			case R.id.action_add_reminder:
+				Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, ContactsContract.Contacts.CONTENT_URI);
+				startActivityForResult(contactPickerIntent, PICK_CONTACT_REQUEST);
+				return true;
+			default:
+				return super.onOptionsItemSelected(menuItem);
+		}
 	}
 	
 	@Override
