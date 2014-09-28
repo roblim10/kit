@@ -61,9 +61,10 @@ public final class R {
         public static final int activity_reminder_list_menu=0x7f070002;
     }
     public static final class string {
-        public static final int action_cancel=0x7f05000e;
-        public static final int action_delete=0x7f05000d;
-        public static final int action_save=0x7f05000c;
+        public static final int action_add_reminder=0x7f05000c;
+        public static final int action_cancel=0x7f05000f;
+        public static final int action_delete=0x7f05000e;
+        public static final int action_save=0x7f05000d;
         public static final int activity_edit_reminder_contact_type_instructions=0x7f05000a;
         public static final int activity_edit_reminder_imageview_desc=0x7f050007;
         public static final int activity_edit_reminder_instructions=0x7f050008;
@@ -71,11 +72,11 @@ public final class R {
         public static final int activity_reminder_list_cab_title=0x7f050006;
         public static final int add_reminder=0x7f050001;
         public static final int app_name=0x7f050000;
-        public static final int contact_type_phone_call=0x7f05000f;
-        public static final int contact_type_text_message=0x7f050010;
+        public static final int contact_type_phone_call=0x7f050010;
+        public static final int contact_type_text_message=0x7f050011;
         public static final int no_reminders_message=0x7f050002;
-        public static final int notification_content_text=0x7f050012;
-        public static final int notification_content_title=0x7f050011;
+        public static final int notification_content_text=0x7f050013;
+        public static final int notification_content_title=0x7f050012;
         public static final int reminder_list_item_imageview_desc=0x7f050003;
         public static final int reminder_list_item_next_reminder=0x7f050005;
         public static final int reminder_list_item_reminder_frequency=0x7f050004;
