@@ -1,5 +1,6 @@
 package com.android.kit.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.joda.time.DateTime;
@@ -16,6 +17,7 @@ import android.util.Log;
 
 import com.android.kit.model.Reminder;
 import com.android.kit.sqlite.ReminderDatabase;
+import com.google.common.collect.Sets;
 
 public class AlarmService extends IntentService  {
 	public final static String EXTRA_REMINDER = "REMINDER";
@@ -55,28 +57,43 @@ public class AlarmService extends IntentService  {
 	
 	private void refreshAllAlarms()  {
 		List<Reminder> reminders = reminderDb.readAllReminders();
-		for (Reminder reminder : reminders)  {
-			cancelAlarm(reminder);
-			createAlarm(reminder);
+		Collection<Reminder> pastReminders = updateExpiredReminders(reminders);
+		if (pastReminders.isEmpty())  {
+			for (Reminder reminder : reminders)  {
+				cancelAlarm(reminder);
+				createAlarm(reminder);
+			}
 		}
 	}
 
+	private Collection<Reminder> updateExpiredReminders(Collection<Reminder> allReminders)  {
+		Collection<Reminder> expiredReminders = Sets.newHashSet();
+		for (Reminder reminder : allReminders)  {
+			DateTime nextReminder = reminder.getNextReminderDate();
+			if (nextReminder.isBeforeNow())  {
+				ReminderAlarmReceiver.handleExpiredReminder(this, reminder);
+				expiredReminders.add(reminder);
+			}
+		}
+		return expiredReminders;
+	}
+	
 	private void createAlarm(Reminder reminder)  {
 		DateTime nextReminder = reminder.getNextReminderDate();
-		PendingIntent operation = createPendingIntent(reminder);
+		PendingIntent operation = createAlarmPendingIntent(reminder);
 		Log.i("KIT", "Creating alarm for " + reminder);
-		
 		//Uncomment to quickly test alarm
-		//alarmManager.set(AlarmManager.RTC_WAKEUP, DateTime.now().plusSeconds(10).getMillis(), operation);
-		alarmManager.set(AlarmManager.RTC_WAKEUP, nextReminder.getMillis(), operation);
+		alarmManager.set(AlarmManager.RTC_WAKEUP, DateTime.now().plusSeconds(10).getMillis(), operation);
+		//alarmManager.set(AlarmManager.RTC_WAKEUP, nextReminder.getMillis(), operation);
+		
 	}
 	
 	private void cancelAlarm(Reminder reminder)  {
-		PendingIntent pi = createPendingIntent(reminder);
+		PendingIntent pi = createAlarmPendingIntent(reminder);
 		alarmManager.cancel(pi);
 	}
 	
-	private PendingIntent createPendingIntent(Reminder reminder)  {
+	private PendingIntent createAlarmPendingIntent(Reminder reminder)  {
 		Intent intent = new Intent(this, ReminderAlarmReceiver.class);
 		intent.putExtra(EXTRA_REMINDER, reminder);
 		return PendingIntent.getBroadcast(this, reminder.getContactId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);

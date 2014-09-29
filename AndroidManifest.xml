@@ -24,8 +24,13 @@
             android:name="com.android.kit.EditReminderActivity"
             android:label="@string/title_activity_edit_reminder" >
         </activity>
-        
-        <service android:name="com.android.kit.service.AlarmService" />
+        <activity
+            android:name="com.android.kit.NotificationHandlerActivity"
+            android:label="@string/title_activity_edit_reminder" >
+        </activity>
+        <service 
+            android:name="com.android.kit.service.AlarmService" 
+            android:exported="false" />
         
         <receiver android:name="com.android.kit.service.CreateRemindersOnBootReceiverReceiver">
             <intent-filter>

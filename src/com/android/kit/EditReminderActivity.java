@@ -148,10 +148,6 @@ public class EditReminderActivity extends Activity {
 		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(this);
 		String reminderDateText = dateFormat.format(nextReminder.getTime());
 		reminderDateHyperlinkView.setClickableText(reminderDateText);
-		
-		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
-		String reminderTimeText = timeFormat.format(nextReminder.getTime());
-		reminderTimeHyperlinkView.setClickableText(reminderTimeText);
 	}
 	
 	private void refreshReminderTimeTextView()  {

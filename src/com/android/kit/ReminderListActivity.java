@@ -54,7 +54,6 @@ public class ReminderListActivity extends Activity {
 		setupDatabase();
 		setupListAdapter();
 		setupListView();
-//		setupAddContactButton();
 		noRemindersTextView = (TextView)findViewById(R.id.activity_contact_list_no_reminders_textview);
 		setupDatabaseSync();
 		refreshUi();
