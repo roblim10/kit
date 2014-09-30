@@ -12,6 +12,7 @@
     <string name="activity_edit_reminder_next_reminder">Next reminder:</string>
     <string name="activity_edit_reminder_contact_type_instructions">Types of contact:</string>
     <string name="title_activity_edit_reminder">Edit reminder</string>
+    <string name="activity_notification_handler_title">Keep in touch</string>
 
     <string name="action_add_reminder">Add</string>
     <string name="action_save">Save</string>
@@ -23,4 +24,9 @@
     
     <string name="notification_content_title">Reminder: Contact %1$s!</string>
     <string name="notification_content_text">Last contacted on %1$s</string>
+    <string-array name="notification_actions">
+        <item>Call</item>
+        <item>Snooze</item>
+        <item>Dismiss</item>
+    </string-array>
 </resources>

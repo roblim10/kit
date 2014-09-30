@@ -38,6 +38,7 @@ public class ReminderAlarmReceiver extends BroadcastReceiver {
 			.setSmallIcon(R.drawable.ic_launcher)
 			.setTicker(context.getString(R.string.notification_content_title, reminder.getName()))
 			.setSound(Settings.System.DEFAULT_NOTIFICATION_URI)
+			.setAutoCancel(true)
 			.setContentIntent(createPendingIntent(context, reminder))
 			.build();
 
@@ -47,6 +48,8 @@ public class ReminderAlarmReceiver extends BroadcastReceiver {
 	
 	private static PendingIntent createPendingIntent(Context context, Reminder reminder)  {
 		Intent intent = new Intent(context, NotificationHandlerActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+		intent.putExtra(AlarmService.EXTRA_REMINDER, reminder);
 		return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	

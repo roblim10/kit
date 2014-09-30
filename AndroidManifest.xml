@@ -26,13 +26,16 @@
         </activity>
         <activity
             android:name="com.android.kit.NotificationHandlerActivity"
-            android:label="@string/title_activity_edit_reminder" >
+            android:label="@string/activity_notification_handler_title"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:taskAffinity="">
         </activity>
         <service 
             android:name="com.android.kit.service.AlarmService" 
             android:exported="false" />
         
-        <receiver android:name="com.android.kit.service.CreateRemindersOnBootReceiverReceiver">
+        <receiver android:name="com.android.kit.service.CreateRemindersOnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
