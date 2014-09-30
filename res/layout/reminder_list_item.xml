@@ -3,17 +3,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="6dip">
+    android:padding="6dp">
     
     <ImageView
         android:id="@+id/reminder_list_item_profile_imageview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:scaleType="fitCenter"
         android:paddingStart="0dip"
         android:paddingEnd="6dip"
-        android:contentDescription="@string/reminder_list_item_imageview_desc"
-        android:src="@drawable/toucan" />
+        android:contentDescription="@string/reminder_list_item_imageview_desc" />
     <TextView
         android:id="@+id/reminder_list_item_name_textview" 
     	android:layout_width="match_parent"

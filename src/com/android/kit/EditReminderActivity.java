@@ -19,6 +19,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -27,6 +28,7 @@ import android.widget.TimePicker;
 import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
+import com.android.kit.util.LoadContactImageTask;
 import com.android.kit.view.HyperlinkView;
 import com.android.kit.view.HyperlinkView.ClickableAction;
 import com.google.common.collect.Sets;
@@ -47,6 +49,7 @@ public class EditReminderActivity extends Activity {
 	//Model for reminder TextViews.  We use Calendar because DatePicker/TimePicker index using Calendar.
 	private Calendar nextReminder;
 	
+	private ImageView contactImageView;
 	private TextView nameTextView;
 	private NumberPicker numberPicker;
 	private NumberPicker unitPicker;
@@ -63,7 +66,8 @@ public class EditReminderActivity extends Activity {
 		Intent fromIntent = getIntent();
 		reminderToEdit = (Reminder)fromIntent.getParcelableExtra(ReminderListActivity.REMINDER_TO_EDIT);
 		nextReminder = reminderToEdit.getNextReminderDate().toCalendar(Locale.getDefault()); 
-				
+		
+		contactImageView = (ImageView)findViewById(R.id.activity_edit_reminder_imageview);
 		nameTextView = (TextView)findViewById(R.id.activity_edit_reminder_name_textview);
 		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_number_picker);
 		unitPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_unit_picker);
@@ -131,6 +135,10 @@ public class EditReminderActivity extends Activity {
 		int frequency = reminderToEdit.getFrequency();
 		TimeUnit units = reminderToEdit.getFrequencyUnit();
 		Set<ContactType> checkedTypes = reminderToEdit.getContactTypes();
+		
+		contactImageView.setImageResource(R.drawable.no_photo);
+		LoadContactImageTask contactImageTask = new LoadContactImageTask(contactImageView, reminderToEdit.getContactId());
+		contactImageTask.execute();
 		
 		nameTextView.setText(name);
 		numberPicker.setValue(frequency);

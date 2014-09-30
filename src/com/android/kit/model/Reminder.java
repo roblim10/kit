@@ -39,6 +39,7 @@ public class Reminder implements Parcelable {
 	
 	public Reminder(int id)  {
 		this.id = id;
+		this.name = "Unknown";
 		this.reminderFrequency = DEFAULT_REMINDER_FREQUENCY;
 		this.reminderFrequencyUnit = DEFAULT_REMINDER_UNIT;
 		this.nextReminderDate = Reminder.getDefaultReminderDate();
@@ -113,13 +114,6 @@ public class Reminder implements Parcelable {
 				id, name, reminderFrequency, 
 				reminderFrequencyUnit != null ? reminderFrequencyUnit.toString() : "null", 
 				nextReminderDate != null ? nextReminderDate.toString() : "null");
-	}
-	
-	public void copy(Reminder reminder)  {
-		setFrequency(reminder.getFrequency());
-		setFrequencyUnit(reminder.getFrequencyUnit());
-		setNextReminderDate(reminder.getNextReminderDate());
-		setContactTypes(reminder.getContactTypes());
 	}
 	
 	@Override

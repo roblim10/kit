@@ -2,7 +2,6 @@
 <resources>
 
     <string name="app_name">Kit</string>
-    <string name="add_reminder">Add reminder</string>
     <string name="no_reminders_message">No reminders set.</string>
     <string name="reminder_list_item_imageview_desc">Profile image for contact</string>
     <string name="reminder_list_item_reminder_frequency">Contact every %1$d %2$s</string>

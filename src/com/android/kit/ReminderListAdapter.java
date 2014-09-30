@@ -10,9 +10,11 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.kit.model.Reminder;
+import com.android.kit.util.LoadContactImageTask;
 import com.google.common.collect.Maps;
 
 
@@ -36,6 +38,9 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 			LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.reminder_list_item, parent, false);
 			
+			ImageView imageView = (ImageView)convertView.findViewById(R.id.reminder_list_item_profile_imageview);
+			viewHolder.imageView = imageView;
+			
 			TextView nameTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_name_textview);
 			viewHolder.nameTextView = nameTextView;
 			
@@ -53,6 +58,12 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		
 		Context context = getContext();
 		Reminder currentReminder = getItem(position);
+		
+		//Load contact image asynchronously
+		viewHolder.imageView.setImageResource(R.drawable.no_photo);
+		LoadContactImageTask contactImageTask = new LoadContactImageTask(
+				viewHolder.imageView, currentReminder.getContactId());
+		contactImageTask.execute();
 		
 		viewHolder.nameTextView.setText(currentReminder.getName());
 		String reminderFrequencyText = context.getString(R.string.reminder_list_item_reminder_frequency,
@@ -87,6 +98,7 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 	//Recommended pattern for managing UI components in custom ListAdapters.  This caches the view
 	//so that every call to getView() doesn't require several findViewById() call.
 	private static class ViewHolder  {
+		public ImageView imageView;
 		public TextView nameTextView;
 		public TextView subTextView;
 		public TextView reminderTextView;
