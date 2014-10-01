@@ -183,7 +183,7 @@ public class ReminderListActivity extends ListActivity {
 			Log.i("KIT", "Created contact " + newReminder.toString());
 		}
 		c.close();
-		launchEditReminderActivity(newReminder, true);		
+		launchEditReminderActivity(newReminder, true);
 	}
 	
 	private void handleAddReminderActivityRequest(Intent data)  {

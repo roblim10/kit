@@ -73,6 +73,7 @@ public class ReminderDatabase {
 			contact.setContactTypes(ContactType.convertContactTypeValue(cursor.getInt(5)));
 			contacts.add(contact);
 		}
+		cursor.close();
 		return contacts;
 	}
 	

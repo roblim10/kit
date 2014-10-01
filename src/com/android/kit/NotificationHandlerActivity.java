@@ -168,6 +168,7 @@ public class NotificationHandlerActivity extends ListActivity {
 			String type = ContactsContract.CommonDataKinds.Phone.getTypeLabel(getResources(), cursor.getInt(1), cursor.getString(2)).toString();
 			phoneLabelMap.put(phone, type);
 		}
+		cursor.close();
 		return phoneLabelMap;
 	}
 	
