@@ -34,11 +34,10 @@ public final class R {
         public static final int no_photo=0x7f020006;
     }
     public static final class id {
-        public static final int action_add_reminder=0x7f090016;
-        public static final int action_cancel=0x7f090013;
-        public static final int action_delete=0x7f090015;
-        public static final int action_save=0x7f090014;
-        public static final int activity_contact_list_no_reminders_textview=0x7f09000d;
+        public static final int action_add_reminder=0x7f090014;
+        public static final int action_cancel=0x7f090011;
+        public static final int action_delete=0x7f090013;
+        public static final int action_save=0x7f090012;
         public static final int activity_edit_reminder_contact_type_listview=0x7f090008;
         public static final int activity_edit_reminder_contact_type_textview=0x7f090007;
         public static final int activity_edit_reminder_imageview=0x7f090000;
@@ -51,12 +50,11 @@ public final class R {
         public static final int activity_notification_handler_instructions_textview=0x7f09000b;
         public static final int activity_notification_handler_name_textview=0x7f09000a;
         public static final int activity_notification_handler_profile_imageview=0x7f090009;
-        public static final int activity_reminder_listview=0x7f09000c;
-        public static final int checkbox_list_item_checkbox=0x7f09000e;
-        public static final int reminder_list_item_date_textview=0x7f090012;
-        public static final int reminder_list_item_name_textview=0x7f090010;
-        public static final int reminder_list_item_profile_imageview=0x7f09000f;
-        public static final int reminder_list_item_subtitle_textview=0x7f090011;
+        public static final int checkbox_list_item_checkbox=0x7f09000c;
+        public static final int reminder_list_item_date_textview=0x7f090010;
+        public static final int reminder_list_item_name_textview=0x7f09000e;
+        public static final int reminder_list_item_profile_imageview=0x7f09000d;
+        public static final int reminder_list_item_subtitle_textview=0x7f09000f;
     }
     public static final class layout {
         public static final int activity_edit_reminder=0x7f030000;

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,24 +24,18 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.android.kit.model.Reminder;
 import com.android.kit.service.CreateRemindersOnBootReceiver;
 import com.android.kit.sqlite.ReminderDatabase;
 
-public class ReminderListActivity extends Activity {
+public class ReminderListActivity extends ListActivity {
 	
 	public final static String REMINDER_TO_EDIT = "com.android.kit.editcontact";
 	private final static int PICK_CONTACT_REQUEST = 1001;
 	private final static int EDIT_REMINDER_REQUEST = 1002;
 	private final static int ADD_REMINDER_REQUEST = 1003;
-	
-	private TextView noRemindersTextView;
-	private ListView listView;
 	
 	private ReminderListAdapter listAdapter;
 	private ReminderDatabase reminderDb;
@@ -54,7 +49,6 @@ public class ReminderListActivity extends Activity {
 		setupDatabase();
 		setupListAdapter();
 		setupListView();
-		noRemindersTextView = (TextView)findViewById(R.id.activity_contact_list_no_reminders_textview);
 		setupDatabaseSync();
 		refreshUi();
 		
@@ -73,16 +67,8 @@ public class ReminderListActivity extends Activity {
 	}
 	
 	private void setupListView()  {
-		listView = (ListView)findViewById(R.id.activity_reminder_listview);
-		listView.setAdapter(listAdapter);
-		listView.setOnItemClickListener(new OnItemClickListener()  {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				Reminder reminderToEdit = (Reminder)parent.getItemAtPosition(position);
-				launchEditReminderActivity(reminderToEdit, false);
-			}
-		});
-		
+		ListView listView = getListView();
+		setListAdapter(listAdapter);
 		listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 		listView.setMultiChoiceModeListener(new MultiChoiceModeListener()  {
 			@Override
@@ -135,6 +121,12 @@ public class ReminderListActivity extends Activity {
 	}
 	
 	@Override
+	public void onListItemClick(ListView listview, View v, int position, long id)  {
+		Reminder reminderToEdit = (Reminder)getListAdapter().getItem(position);
+		launchEditReminderActivity(reminderToEdit, false);
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu)  {
 		MenuInflater menuInflater = getMenuInflater();
 		menuInflater.inflate(R.menu.activity_reminder_list_menu, menu);
@@ -178,10 +170,14 @@ public class ReminderListActivity extends Activity {
 	private void handlePickContactActivityRequest(Intent data)  {
 		Reminder newReminder = null;
 		Uri contactData = data.getData();
-		Cursor c = getContentResolver().query(contactData, null, null, null, null);
+		String[] projection = {
+				ContactsContract.Contacts._ID,
+				ContactsContract.Contacts.DISPLAY_NAME
+		};
+		Cursor c = getContentResolver().query(contactData, projection, null, null, null);
 		while(c.moveToNext())  {
-			int id = c.getInt(c.getColumnIndex(ContactsContract.CommonDataKinds.Identity._ID));
-			String name = c.getString(c.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME));
+			int id = c.getInt(0);
+			String name = c.getString(1);
 			newReminder = new Reminder(id);
 			newReminder.setName(name);
 			Log.i("KIT", "Created contact " + newReminder.toString());
@@ -218,16 +214,8 @@ public class ReminderListActivity extends Activity {
 			protected void onPostExecute(List<Reminder> result)  {
 				listAdapter.clear();
 				listAdapter.addAll(result);
-				updateViewVisibility();
-				
 			}
 		}.execute();
-	}
-	
-	private void updateViewVisibility()  {
-		boolean noReminders = listAdapter.isEmpty();
-		noRemindersTextView.setVisibility(noReminders ? View.VISIBLE : View.GONE);
-		listView.setVisibility(noReminders ? View.GONE : View.VISIBLE);
 	}
 	
 	private void launchEditReminderActivity(Reminder reminderToEdit, boolean isNewReminder)  {
