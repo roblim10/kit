@@ -5,6 +5,7 @@
     android:versionName="1.0" >
 
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-sdk
         android:minSdkVersion="17"
         android:targetSdkVersion="20" />
@@ -41,6 +42,7 @@
             </intent-filter>
         </receiver>
         <receiver android:name="com.android.kit.service.ReminderAlarmReceiver" />
+        <receiver android:name="com.android.kit.service.NotificationRemovedReceiver" />
 	</application>
 
 </manifest>

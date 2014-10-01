@@ -2,6 +2,7 @@ package com.android.kit.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -57,21 +58,24 @@ public class AlarmService extends IntentService  {
 	
 	private void refreshAllAlarms()  {
 		List<Reminder> reminders = reminderDb.readAllReminders();
-		Collection<Reminder> pastReminders = updateExpiredReminders(reminders);
-		if (pastReminders.isEmpty())  {
-			for (Reminder reminder : reminders)  {
+		Set<Reminder> pastReminders = updateExpiredReminders(reminders);
+		for (Reminder reminder : reminders)  {
+			if (pastReminders.contains(reminder))  {
+				ReminderNotificationManager.getInstance().sendNotification(this, reminder);
+			}
+			else  {
 				cancelAlarm(reminder);
 				createAlarm(reminder);
 			}
 		}
 	}
 
-	private Collection<Reminder> updateExpiredReminders(Collection<Reminder> allReminders)  {
-		Collection<Reminder> expiredReminders = Sets.newHashSet();
+	private Set<Reminder> updateExpiredReminders(Collection<Reminder> allReminders)  {
+		Set<Reminder> expiredReminders = Sets.newHashSet();
 		for (Reminder reminder : allReminders)  {
 			DateTime nextReminder = reminder.getNextReminderDate();
 			if (nextReminder.isBeforeNow())  {
-				ReminderAlarmReceiver.handleExpiredReminder(this, reminder);
+				ReminderNotificationManager.getInstance().sendNotification(this, reminder);
 				expiredReminders.add(reminder);
 			}
 		}

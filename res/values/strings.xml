@@ -13,7 +13,11 @@
     <string name="activity_edit_reminder_contact_type_instructions">Types of contact:</string>
     <string name="title_activity_edit_reminder">Edit reminder</string>
     <string name="activity_notification_handler_title">Keep in touch</string>
-
+    <string name="activity_notification_handler_imageview_desc">Profile image for contact</string>
+    <string name="activity_notification_handler_instructions">This is your reminder to keep in touch with %1$s.  Why don\'t you call them now?</string>
+	<string name="activity_notification_handler_no_phone_error">You do not have any phone numbers for this contact.</string>
+	<string name="activity_notification_handler_multi_phone_title">Pick a phone number to call</string>
+    
     <string name="action_add_reminder">Add</string>
     <string name="action_save">Save</string>
     <string name="action_delete">Delete</string>
@@ -26,7 +30,7 @@
     <string name="notification_content_text">Last contacted on %1$s</string>
     <string-array name="notification_actions">
         <item>Call</item>
-        <item>Snooze</item>
-        <item>Dismiss</item>
+        <item>Remind me tomorrow</item>
+        <item>Delete this notification</item>
     </string-array>
 </resources>
