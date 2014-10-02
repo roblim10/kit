@@ -136,8 +136,8 @@ public class EditReminderActivity extends Activity {
 		TimeUnit units = reminderToEdit.getFrequencyUnit();
 		Set<ContactType> checkedTypes = reminderToEdit.getContactTypes();
 		
-		contactImageView.setImageResource(R.drawable.no_photo);
-		LoadContactImageTask contactImageTask = new LoadContactImageTask(contactImageView, reminderToEdit.getContactId());
+		LoadContactImageTask contactImageTask = 
+				new LoadContactImageTask(this, contactImageView, reminderToEdit.getContactId());
 		contactImageTask.execute();
 		
 		nameTextView.setText(name);

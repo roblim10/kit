@@ -62,9 +62,8 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		Reminder currentReminder = getItem(position);
 		
 		//Load contact image asynchronously
-		viewHolder.imageView.setImageResource(R.drawable.no_photo);
-		LoadContactImageTask contactImageTask = new LoadContactImageTask(
-				viewHolder.imageView, currentReminder.getContactId());
+		LoadContactImageTask contactImageTask = 
+				new LoadContactImageTask(context, viewHolder.imageView, currentReminder.getContactId());
 		contactImageTask.execute();
 		
 		viewHolder.nameTextView.setText(currentReminder.getName());

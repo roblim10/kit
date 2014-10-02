@@ -65,7 +65,7 @@ public class NotificationHandlerActivity extends ListActivity {
 	
 	private void setupImageView()  {
 		profileImageView.setImageResource(R.drawable.no_photo);
-		new LoadContactImageTask(profileImageView, reminder.getContactId()).execute();
+		new LoadContactImageTask(this, profileImageView, reminder.getContactId()).execute();
 	}
 	
 	private void setupTextViews()  {
