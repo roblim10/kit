@@ -6,7 +6,8 @@
     <string name="activity_splash_screen_loading">Loading&#8230;</string>
     <string name="activity_splash_screen_imageview_desc">Kit</string>
 
-    <string name="activity_reminders_list_no_reminders">No reminders set</string>
+    <string name="activity_reminder_list_no_reminders">No reminders set</string>
+    <string name="activity_reminder_list_existing_reminder">You already have a reminder set up for this person.  Here\'s the existing one&#8230;</string>
     <string name="activity_reminder_list_cab_title">%1$d reminder(s) selected</string>
 
     <string name="reminder_list_item_imageview_desc">Profile image for contact</string>

@@ -13,7 +13,7 @@
    	    android:layout_width="match_parent"
    	    android:layout_height="match_parent"
    	    android:gravity="center"
-   	    android:text="@string/activity_reminders_list_no_reminders"
+   	    android:text="@string/activity_reminder_list_no_reminders"
    	    android:textSize="24sp"
    	    android:textColor="#999999" />
     

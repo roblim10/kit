@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.kit.model.Reminder;
 import com.android.kit.service.CreateRemindersOnBootReceiver;
@@ -169,22 +170,30 @@ public class ReminderListActivity extends ListActivity {
 	}
 	
 	private void handlePickContactActivityRequest(Intent data)  {
-		Reminder newReminder = null;
+		
 		Uri contactData = data.getData();
 		String[] projection = {
 				ContactsContract.Contacts._ID,
 				ContactsContract.Contacts.DISPLAY_NAME
 		};
 		Cursor c = getContentResolver().query(contactData, projection, null, null, null);
-		while(c.moveToNext())  {
-			int id = c.getInt(0);
-			String name = c.getString(1);
+		c.moveToFirst();
+		int id = c.getInt(0);
+		String name = c.getString(1);
+		c.close();
+		
+		Reminder existingReminder = listAdapter.getReminderForContactId(id);
+		if (existingReminder == null)  {
+			Reminder newReminder = null;
 			newReminder = new Reminder(id);
 			newReminder.setName(name);
+			launchEditReminderActivity(newReminder, true);
 			Log.i("KIT", "Created contact " + newReminder.toString());
 		}
-		c.close();
-		launchEditReminderActivity(newReminder, true);
+		else  {
+			launchEditReminderActivity(existingReminder, false);
+			Toast.makeText(this, R.string.activity_reminder_list_existing_reminder, Toast.LENGTH_LONG).show();
+		}
 	}
 	
 	private void handleAddReminderActivityRequest(Intent data)  {
