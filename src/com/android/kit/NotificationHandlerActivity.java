@@ -84,6 +84,7 @@ public class NotificationHandlerActivity extends ListActivity {
 				break;
 			case 2:
 				dismissNotification();
+				finish();
 				break;
 			default:
 				break;
@@ -99,6 +100,8 @@ public class NotificationHandlerActivity extends ListActivity {
 		else if (phoneTypeMap.size() == 1)  {
 			String firstKey = Iterables.getOnlyElement(phoneTypeMap.keySet());
 			makePhoneCall(firstKey);
+			dismissNotification();
+			finish();
 		}
 		else  {
 			String[] displayChoices = new String[phoneTypeMap.size()];
@@ -116,6 +119,8 @@ public class NotificationHandlerActivity extends ListActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						makePhoneCall(phoneChoices[which]);
+						dismissNotification();
+						finish();
 					}
 				}).create();
 			dialog.show();
@@ -175,7 +180,5 @@ public class NotificationHandlerActivity extends ListActivity {
 	private void makePhoneCall(String number)  {
 		Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + number));
 		startActivity(intent);
-		dismissNotification();
-		finish();
 	}
 }
