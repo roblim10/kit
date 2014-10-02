@@ -40,18 +40,10 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 			LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			convertView = inflater.inflate(R.layout.reminder_list_item, parent, false);
 			
-			ImageView imageView = (ImageView)convertView.findViewById(R.id.reminder_list_item_profile_imageview);
-			viewHolder.imageView = imageView;
-			
-			TextView nameTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_name_textview);
-			viewHolder.nameTextView = nameTextView;
-			
-			TextView subTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_subtitle_textview);
-			viewHolder.subTextView = subTextView;
-			
-			TextView reminderTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_date_textview);
-			viewHolder.reminderTextView = reminderTextView;
-			
+			viewHolder.imageView = (ImageView)convertView.findViewById(R.id.reminder_list_item_profile_imageview);
+			viewHolder.nameTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_name_textview);
+			viewHolder.subTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_subtitle_textview);
+			viewHolder.reminderTextView = (TextView)convertView.findViewById(R.id.reminder_list_item_date_textview);
 			convertView.setTag(viewHolder);
 		}
 		else  {
