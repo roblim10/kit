@@ -1,7 +1,6 @@
 package com.android.kit;
 
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -15,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -29,6 +29,7 @@ import android.widget.ListView;
 import com.android.kit.model.Reminder;
 import com.android.kit.service.CreateRemindersOnBootReceiver;
 import com.android.kit.sqlite.ReminderDatabase;
+import com.google.common.collect.Lists;
 
 public class ReminderListActivity extends ListActivity {
 	
@@ -46,24 +47,24 @@ public class ReminderListActivity extends ListActivity {
 		setContentView(R.layout.activity_reminder_list);
 		getActionBar().setDisplayShowTitleEnabled(false);
 		
-		setupDatabase();
+		reminderDb = ReminderDatabase.getInstance(this);
+		
 		setupListAdapter();
 		setupListView();
 		setupDatabaseSync();
-		refreshUi();
 		
 		//Just a test.  Uncomment to test reboot.
 		CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
 		test.onReceive(this, null);
 	}
 	
-	private void setupDatabase()  {
-		reminderDb = ReminderDatabase.getInstance(this);
-	}
-	
 	private void setupListAdapter()  {
-//		//TODO: Switch to CursorAdapter
-		listAdapter = new ReminderListAdapter(this, new ArrayList<Reminder>());
+		Parcelable[] reminderParcels = getIntent().getParcelableArrayExtra(SplashScreenActivity.EXTRA_REMINDER_ARRAY);
+		List<Reminder> reminders = Lists.newArrayList();
+		for (int i = 0; i < reminderParcels.length; i++)  {
+			reminders.add((Reminder)reminderParcels[i]);
+		}
+		listAdapter = new ReminderListAdapter(this, reminders);
 	}
 	
 	private void setupListView()  {
@@ -203,7 +204,6 @@ public class ReminderListActivity extends ListActivity {
 	}
 	
 	private void refreshUi()  {
-		//TODO: Create a loading spinner
 		new AsyncTask<Void,Void,List<Reminder>>()  {
 			@Override
 			protected List<Reminder> doInBackground(Void... params) {

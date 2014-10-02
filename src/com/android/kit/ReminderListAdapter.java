@@ -2,7 +2,6 @@ package com.android.kit;
 
 import java.text.DateFormat;
 import java.util.List;
-import java.util.Map;
 
 import org.joda.time.DateTime;
 
@@ -15,19 +14,13 @@ import android.widget.TextView;
 
 import com.android.kit.model.Reminder;
 import com.android.kit.util.LoadContactImageTask;
-import com.google.common.collect.Maps;
 
-
+//Use ArrayAdapter over CursorAdapter since there will most likely be very few items in ReminderDatabase.
+//Working with POJOs (Reminder) is much more readable...
 public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
-	
-	private Map<Integer, Reminder> reminderMap;
-	
+
 	public ReminderListAdapter(Context context, List<Reminder> reminderList)  {
 		super(context, R.layout.reminder_list_item, reminderList);
-		reminderMap = Maps.newHashMap();
-		for (Reminder reminder : reminderList)  {
-			reminderMap.put(reminder.getContactId(), reminder);
-		}
 	}
 
 	@Override
@@ -78,16 +71,6 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		int backgroundRes = isSelected(position) ? android.R.color.holo_green_light : android.R.color.transparent;
 		convertView.setBackground(context.getResources().getDrawable(backgroundRes));
 		return convertView;
-	}
-	
-	@Override
-	public void add(Reminder reminder)  {
-		super.add(reminder);
-		reminderMap.put(reminder.getContactId(), reminder);
-	}
-	
-	public Reminder getReminderByContactId(int id)  {
-		return reminderMap.get(id);
 	}
 	
 	private String getDateAsString(DateTime date)  {
