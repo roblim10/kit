@@ -27,7 +27,7 @@
         <activity android:name="com.android.kit.ReminderListActivity" />
         <activity
             android:name="com.android.kit.EditReminderActivity"
-            android:label="@string/title_activity_edit_reminder" >
+            android:label="@string/activity_edit_reminder_title" >
         </activity>
         <activity
             android:name="com.android.kit.NotificationHandlerActivity"

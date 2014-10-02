@@ -2,17 +2,23 @@
 <resources>
 
     <string name="app_name">Kit</string>
-    <string name="no_reminders_message">No reminders set.</string>
+
+    <string name="activity_splash_screen_loading">Loading&#8230;</string>
+    <string name="activity_splash_screen_imageview_desc">Kit</string>
+
+    <string name="activity_reminders_list_no_reminders">No reminders set</string>
+    <string name="activity_reminder_list_cab_title">%1$d reminder(s) selected</string>
+
     <string name="reminder_list_item_imageview_desc">Profile image for contact</string>
     <string name="reminder_list_item_reminder_frequency">Contact every %1$d %2$s</string>
     <string name="reminder_list_item_next_reminder">Next reminder: %1$s</string>
-    <string name="activity_splash_screen_loading">Loading&#8230;</string>
-    <string name="activity_reminder_list_cab_title">%1$d reminder(s) selected</string>
+
     <string name="activity_edit_reminder_imageview_desc">Profile image for contact</string>
     <string name="activity_edit_reminder_instructions">Remind me to contact this person every&#8230;</string>
     <string name="activity_edit_reminder_next_reminder">Next reminder:</string>
     <string name="activity_edit_reminder_contact_type_instructions">Types of contact:</string>
-    <string name="title_activity_edit_reminder">Edit reminder</string>
+    <string name="activity_edit_reminder_title">Edit reminder</string>
+    
     <string name="activity_notification_handler_title">Keep in touch</string>
     <string name="activity_notification_handler_imageview_desc">Profile image for contact</string>
     <string name="activity_notification_handler_instructions">This is your reminder to keep in touch with %1$s.  Why don\'t you call them now?</string>
