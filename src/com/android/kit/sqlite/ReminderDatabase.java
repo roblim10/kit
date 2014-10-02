@@ -23,12 +23,12 @@ public class ReminderDatabase {
 	public final static String EXTRA_REMINDER = "EXTRA_REMINDER";
 	
 	private final static String[] ALL_COLUMNS = {
-		ReminderDatabaseHelper.COLUMN_CONTACT_ID,
-		ReminderDatabaseHelper.COLUMN_CONTACT_NAME,
-		ReminderDatabaseHelper.COLUMN_FREQUENCY,
-		ReminderDatabaseHelper.COLUMN_TIME_UNIT,
-		ReminderDatabaseHelper.COLUMN_NEXT_REMINDER,
-		ReminderDatabaseHelper.COLUMN_CONTACT_TYPES
+		RemindersContract.COLUMN_CONTACT_ID,
+		RemindersContract.COLUMN_CONTACT_NAME,
+		RemindersContract.COLUMN_FREQUENCY,
+		RemindersContract.COLUMN_TIME_UNIT,
+		RemindersContract.COLUMN_NEXT_REMINDER,
+		RemindersContract.COLUMN_CONTACT_TYPES
 	};
 	
 	private Context context;
@@ -62,7 +62,7 @@ public class ReminderDatabase {
 	
 	public List<Reminder> readAllReminders()  {
 		List<Reminder> contacts = Lists.newArrayList();
-		Cursor cursor = database.query(ReminderDatabaseHelper.TABLE_REMINDERS, ALL_COLUMNS, 
+		Cursor cursor = database.query(RemindersContract.TABLE_REMINDERS, ALL_COLUMNS, 
 				null, null, null, null, null);
 		while (cursor.moveToNext())  {
 			Reminder contact = new Reminder(cursor.getInt(0));
@@ -79,35 +79,35 @@ public class ReminderDatabase {
 	
 	public void insert(Reminder reminder) throws SQLException {
 		ContentValues values = convertReminderToContentValues(reminder);
-		database.insertOrThrow(ReminderDatabaseHelper.TABLE_REMINDERS, null, values);
+		database.insertOrThrow(RemindersContract.TABLE_REMINDERS, null, values);
 		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, reminder);
 	}
 	
 	public void update(Reminder reminder)  {
 		ContentValues values = convertReminderToContentValues(reminder);
-		database.update(ReminderDatabaseHelper.TABLE_REMINDERS,
+		database.update(RemindersContract.TABLE_REMINDERS,
 				values,
-				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " = ?",
+				RemindersContract.COLUMN_CONTACT_ID + " = ?",
 				new String[] {Integer.toString(reminder.getContactId())});
 		//TODO: Error check
 		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, reminder);
 	}
 	
 	public void delete(Reminder reminder)  {
-		database.delete(ReminderDatabaseHelper.TABLE_REMINDERS,
-				ReminderDatabaseHelper.COLUMN_CONTACT_ID + " = ?",
+		database.delete(RemindersContract.TABLE_REMINDERS,
+				RemindersContract.COLUMN_CONTACT_ID + " = ?",
 				new String[] { Integer.toString(reminder.getContactId()) });
 		sendDbChangedBroadcast(ACTION_REMINDER_DB_UPDATED, null);
 	}
 	
 	private ContentValues convertReminderToContentValues(Reminder contact)  {
 		ContentValues values = new ContentValues();
-		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_ID, contact.getContactId());
-		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_NAME, contact.getName());
-		values.put(ReminderDatabaseHelper.COLUMN_FREQUENCY, contact.getFrequency());
-		values.put(ReminderDatabaseHelper.COLUMN_TIME_UNIT, contact.getFrequencyUnit().getId());
-		values.put(ReminderDatabaseHelper.COLUMN_NEXT_REMINDER, contact.getNextReminderDate().getMillis());
-		values.put(ReminderDatabaseHelper.COLUMN_CONTACT_TYPES, ContactType.convertContactTypeCollection(contact.getContactTypes()));
+		values.put(RemindersContract.COLUMN_CONTACT_ID, contact.getContactId());
+		values.put(RemindersContract.COLUMN_CONTACT_NAME, contact.getName());
+		values.put(RemindersContract.COLUMN_FREQUENCY, contact.getFrequency());
+		values.put(RemindersContract.COLUMN_TIME_UNIT, contact.getFrequencyUnit().getId());
+		values.put(RemindersContract.COLUMN_NEXT_REMINDER, contact.getNextReminderDate().getMillis());
+		values.put(RemindersContract.COLUMN_CONTACT_TYPES, ContactType.convertContactTypeCollection(contact.getContactTypes()));
 		return values;
 	}
 	
