@@ -13,7 +13,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.android.kit.model.ContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
 import com.google.common.collect.Lists;
@@ -82,12 +81,12 @@ public class ReminderDatabase {
 	}
 	
 	private Reminder convertCursorRowToReminder(Cursor cursor)  {
-		Reminder reminder = new Reminder(cursor.getInt(0));
-		reminder.setName(cursor.getString(1));
-		reminder.setFrequency(cursor.getInt(2));
-		reminder.setFrequencyUnit(TimeUnit.getTimeUnitFromId(cursor.getInt(3)));
-		reminder.setNextReminderDate(new DateTime(cursor.getLong(4)));
-		reminder.setContactTypes(ContactType.convertContactTypeValue(cursor.getInt(5)));
+		Reminder reminder = new Reminder(cursor.getInt(0),
+				cursor.getString(1),
+				cursor.getInt(2),
+				TimeUnit.getTimeUnitFromId(cursor.getInt(3)),
+				new DateTime(cursor.getLong(4)),
+				cursor.getInt(5));
 		return reminder;
 	}
 	
@@ -114,14 +113,14 @@ public class ReminderDatabase {
 		sendDbChangedBroadcast(Intent.ACTION_DELETE, reminder.getContactId());
 	}
 	
-	private ContentValues convertReminderToContentValues(Reminder contact)  {
+	private ContentValues convertReminderToContentValues(Reminder reminder)  {
 		ContentValues values = new ContentValues();
-		values.put(RemindersContract.COLUMN_CONTACT_ID, contact.getContactId());
-		values.put(RemindersContract.COLUMN_CONTACT_NAME, contact.getName());
-		values.put(RemindersContract.COLUMN_FREQUENCY, contact.getFrequency());
-		values.put(RemindersContract.COLUMN_TIME_UNIT, contact.getFrequencyUnit().getId());
-		values.put(RemindersContract.COLUMN_NEXT_REMINDER, contact.getNextReminderDate().getMillis());
-		values.put(RemindersContract.COLUMN_CONTACT_TYPES, ContactType.convertContactTypeCollection(contact.getContactTypes()));
+		values.put(RemindersContract.COLUMN_CONTACT_ID, reminder.getContactId());
+		values.put(RemindersContract.COLUMN_CONTACT_NAME, reminder.getName());
+		values.put(RemindersContract.COLUMN_FREQUENCY, reminder.getFrequency());
+		values.put(RemindersContract.COLUMN_TIME_UNIT, reminder.getFrequencyUnit().getId());
+		values.put(RemindersContract.COLUMN_NEXT_REMINDER, reminder.getNextReminderDate().getMillis());
+		values.put(RemindersContract.COLUMN_CONTACT_TYPES, reminder.getContactTypeFlags());
 		return values;
 	}
 	

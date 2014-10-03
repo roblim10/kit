@@ -132,12 +132,14 @@ public class NotificationHandlerActivity extends ListActivity {
 	}
 	
 	private void snoozeNotification()  {
-		DateTime originalReminderDate = reminder.getNextReminderDate();
-		reminder.setNextReminderDate(DateTime.now()
-				.plusDays(1)
-				.withTime(originalReminderDate.getHourOfDay(), originalReminderDate.getMinuteOfHour(), 0, 0));
 		ReminderNotificationManager.getInstance().cancelNotification(this, reminder.getContactId());
-		ReminderDatabase.getInstance(this).update(reminder);
+		
+		DateTime originalReminderDate = reminder.getNextReminderDate();
+		DateTime newReminderDate = DateTime.now()
+				.plusDays(1)
+				.withTime(originalReminderDate.getHourOfDay(), originalReminderDate.getMinuteOfHour(), 0, 0);
+		Reminder newReminder = reminder.withNextReminderDate(newReminderDate);
+		ReminderDatabase.getInstance(this).update(newReminder);
 	}
 	
 	private void dismissNotification()  {

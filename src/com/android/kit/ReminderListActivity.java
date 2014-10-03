@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,13 +27,11 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.android.kit.model.Reminder;
-import com.android.kit.service.CreateRemindersOnBootReceiver;
 import com.android.kit.sqlite.ReminderDatabase;
 import com.google.common.collect.Lists;
 
 public class ReminderListActivity extends ListActivity {
 	
-	public final static String REMINDER_TO_EDIT = "com.android.kit.editcontact";
 	private final static int PICK_CONTACT_REQUEST = 1001;
 	private final static int EDIT_REMINDER_REQUEST = 1002;
 	private final static int ADD_REMINDER_REQUEST = 1003;
@@ -55,8 +52,8 @@ public class ReminderListActivity extends ListActivity {
 		setupDatabaseSync();
 		
 		//Just a test.  Uncomment to test reboot.
-		CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
-		test.onReceive(this, null);
+		//CreateRemindersOnBootReceiver test = new CreateRemindersOnBootReceiver();
+		//test.onReceive(this, null);
 	}
 	
 	private void setupListAdapter()  {
@@ -124,7 +121,7 @@ public class ReminderListActivity extends ListActivity {
 	@Override
 	public void onListItemClick(ListView listview, View v, int position, long id)  {
 		Reminder reminderToEdit = (Reminder)getListAdapter().getItem(position);
-		launchEditReminderActivity(reminderToEdit, false);
+		launchEditReminderActivity(reminderToEdit);
 	}
 	
 	@Override
@@ -169,7 +166,6 @@ public class ReminderListActivity extends ListActivity {
 	}
 	
 	private void handlePickContactActivityRequest(Intent data)  {
-		
 		Uri contactData = data.getData();
 		String[] projection = {
 				ContactsContract.Contacts._ID,
@@ -183,25 +179,21 @@ public class ReminderListActivity extends ListActivity {
 		
 		Reminder existingReminder = listAdapter.getReminderForContactId(id);
 		if (existingReminder == null)  {
-			Reminder newReminder = null;
-			newReminder = new Reminder(id);
-			newReminder.setName(name);
-			launchEditReminderActivity(newReminder, true);
-			Log.i("KIT", "Created contact " + newReminder.toString());
+			launchEditReminderActivityForContact(id, name);
 		}
 		else  {
-			launchEditReminderActivity(existingReminder, false);
+			launchEditReminderActivity(existingReminder);
 			Toast.makeText(this, R.string.activity_reminder_list_existing_reminder, Toast.LENGTH_LONG).show();
 		}
 	}
 	
 	private void handleAddReminderActivityRequest(Intent data)  {
-		Reminder editedContact = data.getParcelableExtra(EditReminderActivity.EXTRA_EDITED_REMINDER);
+		Reminder editedContact = data.getParcelableExtra(EditReminderActivity.EXTRA_REMINDER_TO_RETURN);
 		reminderDb.insert(editedContact);
 	}
 	
 	private void handleEditReminderActivityRequest(Intent data)  {
-		Reminder editedReminder = data.getParcelableExtra(EditReminderActivity.EXTRA_EDITED_REMINDER);
+		Reminder editedReminder = data.getParcelableExtra(EditReminderActivity.EXTRA_REMINDER_TO_RETURN);
 		reminderDb.update(editedReminder);
 	}
 	
@@ -211,11 +203,22 @@ public class ReminderListActivity extends ListActivity {
 		}
 	}
 	
-	private void launchEditReminderActivity(Reminder reminderToEdit, boolean isNewReminder)  {
+	private void launchEditReminderActivityForContact(int id, String name)  {
 		Intent editReminderIntent = new Intent(this, EditReminderActivity.class);
-		editReminderIntent.putExtra(REMINDER_TO_EDIT, reminderToEdit);
-		startActivityForResult(editReminderIntent, 
-				isNewReminder ? ADD_REMINDER_REQUEST : EDIT_REMINDER_REQUEST);
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_CONTACT_ID, id);
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_CONTACT_NAME, name);
+		startActivityForResult(editReminderIntent, ADD_REMINDER_REQUEST);
+	}
+	
+	private void launchEditReminderActivity(Reminder reminder)  {
+		Intent editReminderIntent = new Intent(this, EditReminderActivity.class);
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_CONTACT_ID, reminder.getContactId());
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_CONTACT_NAME, reminder.getName());
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_FREQUENCY, reminder.getFrequency());
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_TIME_UNIT, reminder.getFrequencyUnit().getId());
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_NEXT_REMINDER, reminder.getNextReminderDate().getMillis());
+		editReminderIntent.putExtra(EditReminderActivity.EXTRA_CONTACT_TYPES, reminder.getContactTypeFlags());
+		startActivityForResult(editReminderIntent, EDIT_REMINDER_REQUEST);
 	}
 	
 	private class DatabaseInsertEditReceiver extends BroadcastReceiver  {

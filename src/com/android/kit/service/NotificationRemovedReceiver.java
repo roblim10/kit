@@ -24,8 +24,8 @@ public class NotificationRemovedReceiver extends BroadcastReceiver {
 	
 	private void setNextAlarm(Context context, Reminder reminder)  {
 		DateTime nextReminder = calculateNextReminderDate(reminder);
-		reminder.setNextReminderDate(nextReminder);
-		ReminderDatabase.getInstance(context).update(reminder);
+		Reminder newReminder = reminder.withNextReminderDate(nextReminder);
+		ReminderDatabase.getInstance(context).update(newReminder);
 	}
 	
 	private DateTime calculateNextReminderDate(Reminder reminder)  {

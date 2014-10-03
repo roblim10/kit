@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Set;
 
 import org.joda.time.DateTime;
 
@@ -31,23 +30,40 @@ import com.android.kit.model.TimeUnit;
 import com.android.kit.util.LoadContactImageTask;
 import com.android.kit.view.HyperlinkView;
 import com.android.kit.view.HyperlinkView.ClickableAction;
-import com.google.common.collect.Sets;
 
 public class EditReminderActivity extends Activity {
-	public final static String EXTRA_EDITED_REMINDER = "EDITED_REMINDER";
+	
+	//Input to launch this activity
+	public final static String EXTRA_CONTACT_ID = "com.android.kit.EXTRA_CONTACT_ID";
+	public final static String EXTRA_CONTACT_NAME = "com.android.kit.EXTRA_CONTACT_NAME";
+	public final static String EXTRA_FREQUENCY = "com.android.kit.EXTRA_FREQUENCY";
+	public final static String EXTRA_TIME_UNIT = "com.android.kit.TIME_UNIT";
+	public final static String EXTRA_NEXT_REMINDER = "com.android.kit.EXTRA_NEXT_REMINDER";
+	public final static String EXTRA_CONTACT_TYPES = "com.android.kit.EXTRA_CONTACT_TYPES";
+	
+	//Output for this activity
+	public final static String EXTRA_REMINDER_TO_RETURN = "com.android.kit.EXTRA_REMINDER_TO_RETURN";
 	
 	private final static int MIN_NUMBER_PICKER_VALUE = 1;
 	private final static int MAX_NUMBER_PICKER_VALUE = 100;
+	
+	private final static int DEFAULT_FREQUENCY = 1;
+	private final static int DEFAULT_UNIT = TimeUnit.WEEKS.getId();
+	private final static int DEFAULT_CONTACT_TYPE_FLAGS = ContactType.PHONE_CALL.getFlag();
+	private final static int DEFAULT_REMINDER_HOUR = 18;
+	private final static long DEFAULT_REMINDER_DATE = DateTime.now()
+			.plusWeeks(DEFAULT_FREQUENCY)
+			.withTime(DEFAULT_REMINDER_HOUR, 0, 0, 0)
+			.getMillis();
 	
 	private final static ContactType[] TYPE_ITEMS = {
 		ContactType.PHONE_CALL,
 		ContactType.SMS
 	};
-		
-	private Reminder reminderToEdit;
-	
-	//Model for reminder TextViews.  We use Calendar because DatePicker/TimePicker index using Calendar.
-	private Calendar nextReminder;
+
+	private int reminderContactId;
+	private String reminderContactName;
+	private DateTime nextReminder;
 	
 	private ImageView contactImageView;
 	private TextView nameTextView;
@@ -63,10 +79,6 @@ public class EditReminderActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_edit_reminder);
 		
-		Intent fromIntent = getIntent();
-		reminderToEdit = (Reminder)fromIntent.getParcelableExtra(ReminderListActivity.REMINDER_TO_EDIT);
-		nextReminder = reminderToEdit.getNextReminderDate().toCalendar(Locale.getDefault()); 
-		
 		contactImageView = (ImageView)findViewById(R.id.activity_edit_reminder_imageview);
 		nameTextView = (TextView)findViewById(R.id.activity_edit_reminder_name_textview);
 		numberPicker = (NumberPicker)findViewById(R.id.activity_edit_reminder_number_picker);
@@ -79,7 +91,15 @@ public class EditReminderActivity extends Activity {
 		setupReminderTextViews();
 		setupContactTypeListView();
 		
-		populateViews();
+		Intent fromIntent = getIntent();
+		reminderContactId = fromIntent.getIntExtra(EXTRA_CONTACT_ID, -1);
+		reminderContactName = fromIntent.getStringExtra(EXTRA_CONTACT_NAME);
+		int frequency = fromIntent.getIntExtra(EXTRA_FREQUENCY, DEFAULT_FREQUENCY);
+		TimeUnit unit = TimeUnit.getTimeUnitFromId(fromIntent.getIntExtra(EXTRA_TIME_UNIT, DEFAULT_UNIT));
+		nextReminder = new DateTime(fromIntent.getLongExtra(EXTRA_NEXT_REMINDER, DEFAULT_REMINDER_DATE));
+		int contactTypeFlags = fromIntent.getIntExtra(EXTRA_CONTACT_TYPES, DEFAULT_CONTACT_TYPE_FLAGS);
+		
+		populateViews(reminderContactId, reminderContactName, frequency, unit, nextReminder, contactTypeFlags);
 	}
 	
 	private void setupNumberPicker()  {
@@ -103,9 +123,11 @@ public class EditReminderActivity extends Activity {
 			@Override
 			public void onClick(View widget) {
 				OnDateSetListener listener = createReminderDateSetListener();
-				int year = nextReminder.get(Calendar.YEAR);
-				int month = nextReminder.get(Calendar.MONTH);
-				int day = nextReminder.get(Calendar.DAY_OF_MONTH);
+				//Convert to calendar because DatePickerFragment works with Calendars
+				Calendar calendar = nextReminder.toCalendar(Locale.getDefault());
+				int year = calendar.get(Calendar.YEAR);
+				int month = calendar.get(Calendar.MONTH);
+				int day = calendar.get(Calendar.DAY_OF_MONTH);
 				DatePickerFragment datePicker = new DatePickerFragment(listener, year, month, day);
 				datePicker.show(getFragmentManager(), "reminderDatePicker");
 			}
@@ -115,8 +137,10 @@ public class EditReminderActivity extends Activity {
 			@Override
 			public void onClick(View widget) {
 				OnTimeSetListener listener = createReminderTimeSetListener();
-				int hour = nextReminder.get(Calendar.HOUR_OF_DAY);
-				int minute = nextReminder.get(Calendar.MINUTE);
+				//Convert to calendar because TimePickerFragment works with Calendars
+				Calendar calendar = nextReminder.toCalendar(Locale.getDefault());
+				int hour = calendar.get(Calendar.HOUR_OF_DAY);
+				int minute = calendar.get(Calendar.MINUTE);
 				TimePickerFragment timePicker = new TimePickerFragment(listener, hour, minute);
 				timePicker.show(getFragmentManager(), "reminderTimePicker");				
 			}
@@ -130,37 +154,33 @@ public class EditReminderActivity extends Activity {
 		contactTypeListView.setAdapter(contactTypeListAdapter);
 	}
 	
-	private void populateViews()  {
-		String name = reminderToEdit.getName();
-		int frequency = reminderToEdit.getFrequency();
-		TimeUnit units = reminderToEdit.getFrequencyUnit();
-		Set<ContactType> checkedTypes = reminderToEdit.getContactTypes();
-		
+	private void populateViews(int id, String name, int frequency, TimeUnit units, 
+			DateTime nextReminder, int contactTypeFlags)  {
 		LoadContactImageTask contactImageTask = 
-				new LoadContactImageTask(this, contactImageView, reminderToEdit.getContactId());
+				new LoadContactImageTask(this, contactImageView, id);
 		contactImageTask.execute();
 		
 		nameTextView.setText(name);
 		numberPicker.setValue(frequency);
 		unitPicker.setValue(units.getId());
-		refreshReminderDateTextView();
-		refreshReminderTimeTextView();
+		refreshReminderDateTextView(nextReminder);
+		refreshReminderTimeTextView(nextReminder);
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
 			ContactType contactType = contactTypeListAdapter.getItem(i);
-			boolean isChecked = checkedTypes.contains(contactType);
+			boolean isChecked = (contactType.getFlag() & contactTypeFlags) == contactType.getFlag();
 			contactTypeListAdapter.setSelected(i, isChecked);
 		}
 	}
 	
-	private void refreshReminderDateTextView()  {
+	private void refreshReminderDateTextView(DateTime reminderDate)  {
 		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(this);
-		String reminderDateText = dateFormat.format(nextReminder.getTime());
+		String reminderDateText = dateFormat.format(reminderDate.toDate());
 		reminderDateHyperlinkView.setClickableText(reminderDateText);
 	}
 	
-	private void refreshReminderTimeTextView()  {
+	private void refreshReminderTimeTextView(DateTime reminderDate)  {
 		DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(this);
-		String reminderTimeText = timeFormat.format(nextReminder.getTime());
+		String reminderTimeText = timeFormat.format(reminderDate.toDate());
 		reminderTimeHyperlinkView.setClickableText(reminderTimeText);
 	}
 	
@@ -175,9 +195,9 @@ public class EditReminderActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem menuItem)  {
 		switch (menuItem.getItemId())  {
 			case R.id.action_save:
-				saveContact();
+				Reminder newReminder = saveContact();
 				Intent intent = new Intent();
-				intent.putExtra(EXTRA_EDITED_REMINDER, reminderToEdit);
+				intent.putExtra(EXTRA_REMINDER_TO_RETURN, newReminder);
 				setResult(RESULT_OK, intent);
 				finish();
 				return true;
@@ -190,28 +210,33 @@ public class EditReminderActivity extends Activity {
 		}
 	}
 	
-	private void saveContact()  {
+	private Reminder saveContact()  {
 		int frequency = numberPicker.getValue();
 		TimeUnit units = TimeUnit.getTimeUnitFromId(unitPicker.getValue());
-		Set<ContactType> contactTypes = Sets.newHashSet(contactTypeListAdapter.getSelectedItems());
-		reminderToEdit.setFrequency(frequency);
-		reminderToEdit.setFrequencyUnit(units);
-		reminderToEdit.setNextReminderDate(new DateTime(nextReminder.getTimeInMillis()));
-		reminderToEdit.setContactTypes(contactTypes);
+		int contactTypeFlags = 0;
+		for (ContactType contactType : contactTypeListAdapter.getSelectedItems())  {
+			contactTypeFlags |= contactType.getFlag();
+		}
+		Reminder newReminder = new Reminder(reminderContactId,
+				reminderContactName,
+				frequency,
+				units,
+				nextReminder,
+				contactTypeFlags);
+		return newReminder;
 	}
 	
 	private OnDateSetListener createReminderDateSetListener()  {
 		return new OnDateSetListener()  {
 			@Override
 			public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-				//Convert to calendar first since DatePickers index according to Calendar, not DateTime
-				nextReminder = new GregorianCalendar(
-						year, 
-						monthOfYear, 
-						dayOfMonth, 
-						nextReminder.get(Calendar.HOUR_OF_DAY), 
-						nextReminder.get(Calendar.MINUTE));
-				refreshReminderDateTextView();
+				//DateTimeFragment deals with Calendar, so we need to convert to DateTime
+				//but preserve the time of nextReminder
+				Calendar calendar = new GregorianCalendar(year, monthOfYear, dayOfMonth);
+				nextReminder = new DateTime(calendar.getTimeInMillis())
+					.withTime(nextReminder.getHourOfDay(), nextReminder.getMinuteOfHour(), 
+							nextReminder.getSecondOfMinute(), nextReminder.getMillisOfSecond());
+				refreshReminderDateTextView(nextReminder);
 			}
 		};
 	}
@@ -220,13 +245,8 @@ public class EditReminderActivity extends Activity {
 		return new OnTimeSetListener()  {
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				nextReminder = new GregorianCalendar(
-						nextReminder.get(Calendar.YEAR), 
-						nextReminder.get(Calendar.MONTH), 
-						nextReminder.get(Calendar.DAY_OF_MONTH),
-						hourOfDay, 
-						minute);
-				refreshReminderTimeTextView();
+				nextReminder = nextReminder.withTime(hourOfDay, minute, 0, 0);
+				refreshReminderTimeTextView(nextReminder);
 			}
 		};
 	}
