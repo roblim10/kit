@@ -40,12 +40,16 @@ public class AlarmService extends IntentService  {
 	}
 	
 	private void setupDatabaseSync()  {
-		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				refreshAllAlarms();
-			}
-		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
+//		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
+//			@Override
+//			public void onReceive(Context context, Intent intent) {
+//				refreshAllAlarms();
+//			}
+//		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
+		DatabaseChangedReceiver receiver = new DatabaseChangedReceiver();
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Intent.ACTION_INSERT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Intent.ACTION_EDIT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Intent.ACTION_DELETE));
 	}
 	
 	@Override
@@ -64,7 +68,7 @@ public class AlarmService extends IntentService  {
 				ReminderNotificationManager.getInstance().sendNotification(this, reminder);
 			}
 			else  {
-				cancelAlarm(reminder);
+				cancelAlarm(reminder.getContactId());
 				createAlarm(reminder);
 			}
 		}
@@ -92,8 +96,9 @@ public class AlarmService extends IntentService  {
 		
 	}
 	
-	private void cancelAlarm(Reminder reminder)  {
-		PendingIntent pi = createAlarmPendingIntent(reminder);
+	private void cancelAlarm(int contactId)  {
+		Intent intent = new Intent(this, ReminderAlarmReceiver.class);
+		PendingIntent pi = PendingIntent.getBroadcast(this, contactId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		alarmManager.cancel(pi);
 	}
 	
@@ -101,5 +106,27 @@ public class AlarmService extends IntentService  {
 		Intent intent = new Intent(this, ReminderAlarmReceiver.class);
 		intent.putExtra(EXTRA_REMINDER, reminder);
 		return PendingIntent.getBroadcast(this, reminder.getContactId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+	}
+	
+	private class DatabaseChangedReceiver extends BroadcastReceiver  {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			int contactId = intent.getIntExtra(ReminderDatabase.EXTRA_REMINDER_ID, -1);
+			
+			if (Intent.ACTION_INSERT.equals(action))  {
+				Reminder reminder = ReminderDatabase.getInstance(AlarmService.this).readReminder(contactId);
+				createAlarm(reminder);
+			}
+			else if (Intent.ACTION_EDIT.equals(action))  {
+				Reminder reminder = ReminderDatabase.getInstance(AlarmService.this).readReminder(contactId);
+				cancelAlarm(contactId);
+				createAlarm(reminder);
+			}
+			else if (Intent.ACTION_DELETE.equals(action))  {
+				cancelAlarm(contactId);
+				ReminderNotificationManager.getInstance().cancelNotification(AlarmService.this, contactId);
+			}
+		}
 	}
 }

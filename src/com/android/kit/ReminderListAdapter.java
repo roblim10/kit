@@ -86,10 +86,23 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 	
 	@Override
 	public void addAll(Collection<? extends Reminder> reminders)  {
-		super.addAll(reminders);
+		super.addAll(reminders);		
 		for (Reminder reminder : reminders)  {
 			idReminderMap.put(reminder.getContactId(), reminder);
 		}
+	}
+	
+	public void removeByContactId(int contactId)  {
+		Reminder reminder = idReminderMap.get(contactId);
+		idReminderMap.remove(contactId);
+		super.remove(reminder);
+	}
+	
+	
+	public void update(Reminder reminder)  {
+		Reminder originalReminder = idReminderMap.get(reminder.getContactId());
+		remove(originalReminder);
+		add(reminder);
 	}
 	
 	@Override

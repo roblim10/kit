@@ -58,8 +58,8 @@ public class ReminderNotificationManager  {
 		return PendingIntent.getBroadcast(context, reminder.getContactId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	
-	public void cancelNotification(Context context, Reminder reminder)  {
+	public void cancelNotification(Context context, int contactId)  {
 		NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
-		manager.cancel(reminder.getContactId());
+		manager.cancel(contactId);
 	}
 }

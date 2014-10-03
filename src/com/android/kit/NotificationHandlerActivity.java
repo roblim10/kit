@@ -136,12 +136,12 @@ public class NotificationHandlerActivity extends ListActivity {
 		reminder.setNextReminderDate(DateTime.now()
 				.plusDays(1)
 				.withTime(originalReminderDate.getHourOfDay(), originalReminderDate.getMinuteOfHour(), 0, 0));
-		ReminderNotificationManager.getInstance().cancelNotification(this, reminder);
+		ReminderNotificationManager.getInstance().cancelNotification(this, reminder.getContactId());
 		ReminderDatabase.getInstance(this).update(reminder);
 	}
 	
 	private void dismissNotification()  {
-		ReminderNotificationManager.getInstance().cancelNotification(this, reminder);
+		ReminderNotificationManager.getInstance().cancelNotification(this, reminder.getContactId());
 		//cancelNotification() does not trigger deleteIntent, so trigger it with below Intent
 		Intent i = new Intent(this, NotificationRemovedReceiver.class);
 		i.putExtra(AlarmService.EXTRA_REMINDER, reminder);

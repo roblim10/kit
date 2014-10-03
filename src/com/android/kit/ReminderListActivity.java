@@ -114,12 +114,11 @@ public class ReminderListActivity extends ListActivity {
 	}
 	
 	private void setupDatabaseSync()  {
-		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				refreshUi();
-			}
-		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
+		DatabaseInsertEditReceiver insertEditReceiver = new DatabaseInsertEditReceiver();
+		DatabaseDeleteReceiver deleteReceiver = new DatabaseDeleteReceiver();
+		LocalBroadcastManager.getInstance(this).registerReceiver(insertEditReceiver, new IntentFilter(Intent.ACTION_INSERT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(insertEditReceiver, new IntentFilter(Intent.ACTION_EDIT));
+		LocalBroadcastManager.getInstance(this).registerReceiver(deleteReceiver, new IntentFilter(Intent.ACTION_DELETE));
 	}
 	
 	@Override
@@ -212,25 +211,46 @@ public class ReminderListActivity extends ListActivity {
 		}
 	}
 	
-	private void refreshUi()  {
-		new AsyncTask<Void,Void,List<Reminder>>()  {
-			@Override
-			protected List<Reminder> doInBackground(Void... params) {
-				return reminderDb.readAllReminders();
-			}
-			
-			@Override
-			protected void onPostExecute(List<Reminder> result)  {
-				listAdapter.clear();
-				listAdapter.addAll(result);
-			}
-		}.execute();
-	}
-	
 	private void launchEditReminderActivity(Reminder reminderToEdit, boolean isNewReminder)  {
 		Intent editReminderIntent = new Intent(this, EditReminderActivity.class);
 		editReminderIntent.putExtra(REMINDER_TO_EDIT, reminderToEdit);
 		startActivityForResult(editReminderIntent, 
 				isNewReminder ? ADD_REMINDER_REQUEST : EDIT_REMINDER_REQUEST);
+	}
+	
+	private class DatabaseInsertEditReceiver extends BroadcastReceiver  {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			final int contactId = intent.getIntExtra(ReminderDatabase.EXTRA_REMINDER_ID, -1);
+			final String action = intent.getAction();
+			new AsyncTask<Void, Void, Reminder>()  {
+
+				@Override
+				protected Reminder doInBackground(Void... params) {
+					Reminder reminder = ReminderDatabase.getInstance(ReminderListActivity.this).readReminder(contactId);
+					return reminder;
+				}
+				
+				@Override
+				protected void onPostExecute(Reminder reminder)  {
+					if (Intent.ACTION_INSERT.equals(action))  {
+						listAdapter.add(reminder);
+					}
+					else if (Intent.ACTION_EDIT.equals(action))  {
+						listAdapter.update(reminder);
+					}
+				}
+			}.execute();
+		}
+	}
+	
+	private class DatabaseDeleteReceiver extends BroadcastReceiver  {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			int contactId = intent.getIntExtra(ReminderDatabase.EXTRA_REMINDER_ID, -1);
+			listAdapter.removeByContactId(contactId);
+		}
+		
 	}
 }
