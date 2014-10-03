@@ -2,6 +2,8 @@ package com.android.kit;
 
 import java.util.Map;
 
+import org.joda.time.DateTime;
+
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.ContentResolver;
@@ -27,6 +29,7 @@ import com.android.kit.model.Reminder;
 import com.android.kit.service.AlarmService;
 import com.android.kit.service.NotificationRemovedReceiver;
 import com.android.kit.service.ReminderNotificationManager;
+import com.android.kit.sqlite.ReminderDatabase;
 import com.android.kit.util.LoadContactImageTask;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -81,6 +84,7 @@ public class NotificationHandlerActivity extends ListActivity {
 				break;
 			case 1:
 				snoozeNotification();
+				finish();
 				break;
 			case 2:
 				dismissNotification();
@@ -128,8 +132,12 @@ public class NotificationHandlerActivity extends ListActivity {
 	}
 	
 	private void snoozeNotification()  {
-		//TODO: Set new alarm for some time
-		//TODO: Update notification to come some time later
+		DateTime originalReminderDate = reminder.getNextReminderDate();
+		reminder.setNextReminderDate(DateTime.now()
+				.plusDays(1)
+				.withTime(originalReminderDate.getHourOfDay(), originalReminderDate.getMinuteOfHour(), 0, 0));
+		ReminderNotificationManager.getInstance().cancelNotification(this, reminder);
+		ReminderDatabase.getInstance(this).update(reminder);
 	}
 	
 	private void dismissNotification()  {

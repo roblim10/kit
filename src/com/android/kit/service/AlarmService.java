@@ -87,8 +87,8 @@ public class AlarmService extends IntentService  {
 		PendingIntent operation = createAlarmPendingIntent(reminder);
 		Log.i("KIT", "Creating alarm for " + reminder);
 		//Uncomment to quickly test alarm
-		alarmManager.set(AlarmManager.RTC_WAKEUP, DateTime.now().plusSeconds(10).getMillis(), operation);
-		//alarmManager.set(AlarmManager.RTC_WAKEUP, nextReminder.getMillis(), operation);
+		//alarmManager.set(AlarmManager.RTC_WAKEUP, DateTime.now().plusSeconds(10).getMillis(), operation);
+		alarmManager.set(AlarmManager.RTC_WAKEUP, nextReminder.getMillis(), operation);
 		
 	}
 	
