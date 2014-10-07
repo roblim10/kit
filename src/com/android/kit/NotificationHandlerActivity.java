@@ -28,7 +28,7 @@ import android.widget.Toast;
 import com.android.kit.model.Reminder;
 import com.android.kit.service.AlarmService;
 import com.android.kit.service.NotificationRemovedReceiver;
-import com.android.kit.service.ReminderNotificationManager;
+import com.android.kit.service.ReminderNotificationHelper;
 import com.android.kit.sqlite.ReminderDatabase;
 import com.android.kit.util.LoadContactImageTask;
 import com.google.common.collect.Iterables;
@@ -132,7 +132,7 @@ public class NotificationHandlerActivity extends ListActivity {
 	}
 	
 	private void snoozeNotification()  {
-		ReminderNotificationManager.getInstance().cancelNotification(this, reminder.getContactId());
+		ReminderNotificationHelper.cancelNotification(this, reminder.getContactId());
 		
 		DateTime originalReminderDate = reminder.getNextReminderDate();
 		DateTime newReminderDate = DateTime.now()
@@ -143,7 +143,7 @@ public class NotificationHandlerActivity extends ListActivity {
 	}
 	
 	private void dismissNotification()  {
-		ReminderNotificationManager.getInstance().cancelNotification(this, reminder.getContactId());
+		ReminderNotificationHelper.cancelNotification(this, reminder.getContactId());
 		//cancelNotification() does not trigger deleteIntent, so trigger it with below Intent
 		Intent i = new Intent(this, NotificationRemovedReceiver.class);
 		i.putExtra(AlarmService.EXTRA_REMINDER, reminder);

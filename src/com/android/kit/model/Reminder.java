@@ -107,5 +107,22 @@ public class Reminder implements Parcelable {
 			return new Reminder[size];
 		} 
 	};
-			
+	
+	public static DateTime calculateNextReminderDate(Reminder reminder)  {
+		int frequency = reminder.getFrequency();
+		TimeUnit unit = reminder.getFrequencyUnit();
+		DateTime newReminderDate = reminder.getNextReminderDate();
+		do  {
+			switch (unit)  {
+				case DAYS: newReminderDate = newReminderDate.plusDays(frequency); break;
+				case WEEKS: newReminderDate = newReminderDate.plusWeeks(frequency); break;
+				case MONTHS: newReminderDate = newReminderDate.plusMonths(frequency); break;
+				case YEARS: newReminderDate = newReminderDate.plusYears(frequency); break;
+				default:
+					throw new UnsupportedOperationException("Unknown TimeUnit: " + unit);
+			}
+		} while (newReminderDate.isBeforeNow());
+		return newReminderDate;
+//		return DateTime.now().plusSeconds(20);
+	}
 }

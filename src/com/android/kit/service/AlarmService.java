@@ -65,7 +65,7 @@ public class AlarmService extends IntentService  {
 		Set<Reminder> pastReminders = updateExpiredReminders(reminders);
 		for (Reminder reminder : reminders)  {
 			if (pastReminders.contains(reminder))  {
-				ReminderNotificationManager.getInstance().sendNotification(this, reminder);
+				ReminderNotificationHelper.sendNotification(this, reminder);
 			}
 			else  {
 				cancelAlarm(reminder.getContactId());
@@ -79,7 +79,7 @@ public class AlarmService extends IntentService  {
 		for (Reminder reminder : allReminders)  {
 			DateTime nextReminder = reminder.getNextReminderDate();
 			if (nextReminder.isBeforeNow())  {
-				ReminderNotificationManager.getInstance().sendNotification(this, reminder);
+				ReminderNotificationHelper.sendNotification(this, reminder);
 				expiredReminders.add(reminder);
 			}
 		}
@@ -125,7 +125,7 @@ public class AlarmService extends IntentService  {
 			}
 			else if (Intent.ACTION_DELETE.equals(action))  {
 				cancelAlarm(contactId);
-				ReminderNotificationManager.getInstance().cancelNotification(AlarmService.this, contactId);
+				ReminderNotificationHelper.cancelNotification(AlarmService.this, contactId);
 			}
 		}
 	}

@@ -12,23 +12,9 @@ import com.android.kit.NotificationHandlerActivity;
 import com.android.kit.R;
 import com.android.kit.model.Reminder;
 
-public class ReminderNotificationManager  {
+public class ReminderNotificationHelper  {
 	
-	private static ReminderNotificationManager manager;
-	
-	private ReminderNotificationManager()  {
-		
-	}
-	
-	public static ReminderNotificationManager getInstance()  {
-		if (manager == null)  {
-			manager = new ReminderNotificationManager();	
-		}
-		return manager;
-		
-	}
-	
-	public void sendNotification(Context context, Reminder reminder)  {
+	public static void sendNotification(Context context, Reminder reminder)  {
 		//TODO:Fill out content text
 		Notification n = new Notification.Builder(context)
 			.setContentTitle(context.getString(R.string.notification_content_title, reminder.getName()))
@@ -45,20 +31,20 @@ public class ReminderNotificationManager  {
 		manager.notify(reminder.getContactId(), n);
 	}
 	
-	private PendingIntent createPendingIntent(Context context, Reminder reminder)  {
+	private static PendingIntent createPendingIntent(Context context, Reminder reminder)  {
 		Intent intent = new Intent(context, NotificationHandlerActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		intent.putExtra(AlarmService.EXTRA_REMINDER, reminder);
 		return PendingIntent.getActivity(context, reminder.getContactId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	
-	private PendingIntent createDeletePendingIntent(Context context, Reminder reminder)  {
+	private static PendingIntent createDeletePendingIntent(Context context, Reminder reminder)  {
 		Intent intent = new Intent(context, NotificationRemovedReceiver.class);
 		intent.putExtra(AlarmService.EXTRA_REMINDER,  reminder);
 		return PendingIntent.getBroadcast(context, reminder.getContactId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 	}
 	
-	public void cancelNotification(Context context, int contactId)  {
+	public static void cancelNotification(Context context, int contactId)  {
 		NotificationManager manager = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		manager.cancel(contactId);
 	}

@@ -12,7 +12,7 @@ public class ReminderAlarmReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Reminder reminder = intent.getParcelableExtra(AlarmService.EXTRA_REMINDER);
 		Log.i("KIT", "ReminderAlarmReceiver received: " + reminder);
-		ReminderNotificationManager.getInstance().sendNotification(context, reminder);
+		ReminderNotificationHelper.sendNotification(context, reminder);
 	}
 
 }
