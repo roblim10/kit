@@ -24,7 +24,8 @@ import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.android.kit.model.ContactType;
+import com.android.kit.contacttypes.ContactTypeRegistry;
+import com.android.kit.contacttypes.IContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
 import com.android.kit.util.LoadContactImageTask;
@@ -49,18 +50,14 @@ public class EditReminderActivity extends Activity {
 	
 	private final static int DEFAULT_FREQUENCY = 1;
 	private final static int DEFAULT_UNIT = TimeUnit.WEEKS.getId();
-	private final static int DEFAULT_CONTACT_TYPE_FLAGS = ContactType.PHONE_CALL.getFlag();
 	private final static int DEFAULT_REMINDER_HOUR = 18;
 	private final static long DEFAULT_REMINDER_DATE = DateTime.now()
 			.plusWeeks(DEFAULT_FREQUENCY)
 			.withTime(DEFAULT_REMINDER_HOUR, 0, 0, 0)
 			.getMillis();
-	
-	private final static ContactType[] TYPE_ITEMS = {
-		ContactType.PHONE_CALL,
-		ContactType.SMS
-	};
 
+	private ContactTypeRegistry contactTypeRegistry;
+	
 	private int reminderContactId;
 	private String reminderContactName;
 	private DateTime nextReminder;
@@ -71,12 +68,16 @@ public class EditReminderActivity extends Activity {
 	private NumberPicker unitPicker;
 	private HyperlinkView reminderDateHyperlinkView;
 	private HyperlinkView reminderTimeHyperlinkView;
-	private CheckBoxListAdapter<ContactType> contactTypeListAdapter;
+	private CheckBoxListAdapter<IContactType> contactTypeListAdapter;
 	private ListView contactTypeListView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		KitApplication app = (KitApplication)getApplication();
+		contactTypeRegistry = app.getContactTypeRegistry();
+		
 		setContentView(R.layout.activity_edit_reminder);
 		
 		contactImageView = (ImageView)findViewById(R.id.activity_edit_reminder_imageview);
@@ -97,7 +98,7 @@ public class EditReminderActivity extends Activity {
 		int frequency = fromIntent.getIntExtra(EXTRA_FREQUENCY, DEFAULT_FREQUENCY);
 		TimeUnit unit = TimeUnit.getTimeUnitFromId(fromIntent.getIntExtra(EXTRA_TIME_UNIT, DEFAULT_UNIT));
 		nextReminder = new DateTime(fromIntent.getLongExtra(EXTRA_NEXT_REMINDER, DEFAULT_REMINDER_DATE));
-		int contactTypeFlags = fromIntent.getIntExtra(EXTRA_CONTACT_TYPES, DEFAULT_CONTACT_TYPE_FLAGS);
+		int contactTypeFlags = fromIntent.getIntExtra(EXTRA_CONTACT_TYPES, contactTypeRegistry.getDefaultFlag());
 		
 		populateViews(reminderContactId, reminderContactName, frequency, unit, nextReminder, contactTypeFlags);
 	}
@@ -149,7 +150,8 @@ public class EditReminderActivity extends Activity {
 	}
 	
 	private void setupContactTypeListView()  {
-		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, TYPE_ITEMS);
+		
+		contactTypeListAdapter = new CheckBoxListAdapter<IContactType>(this, contactTypeRegistry.getTypes());
 		contactTypeListView = (ListView)findViewById(R.id.activity_edit_reminder_contact_type_listview);
 		contactTypeListView.setAdapter(contactTypeListAdapter);
 	}
@@ -166,7 +168,7 @@ public class EditReminderActivity extends Activity {
 		refreshReminderDateTextView(nextReminder);
 		refreshReminderTimeTextView(nextReminder);
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
-			ContactType contactType = contactTypeListAdapter.getItem(i);
+			IContactType contactType = contactTypeListAdapter.getItem(i);
 			boolean isChecked = (contactType.getFlag() & contactTypeFlags) != 0;
 			contactTypeListAdapter.setSelected(i, isChecked);
 		}
@@ -214,7 +216,7 @@ public class EditReminderActivity extends Activity {
 		int frequency = numberPicker.getValue();
 		TimeUnit units = TimeUnit.getTimeUnitFromId(unitPicker.getValue());
 		int contactTypeFlags = 0;
-		for (ContactType contactType : contactTypeListAdapter.getSelectedItems())  {
+		for (IContactType contactType : contactTypeListAdapter.getSelectedItems())  {
 			contactTypeFlags |= contactType.getFlag();
 		}
 		Reminder newReminder = new Reminder(reminderContactId,

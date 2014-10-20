@@ -1,5 +1,7 @@
 package com.android.kit;
 
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,10 @@ public class CheckBoxListAdapter<T> extends SelectableListAdapter<T>  {
 	};
 	
 	public CheckBoxListAdapter(Context context, T[] options)  {
+		super(context, R.layout.checkbox_list_item, options);
+	}
+	
+	public CheckBoxListAdapter(Context context, List<T> options)  {
 		super(context, R.layout.checkbox_list_item, options);
 	}
 	
