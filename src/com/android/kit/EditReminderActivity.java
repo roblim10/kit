@@ -167,7 +167,7 @@ public class EditReminderActivity extends Activity {
 		refreshReminderTimeTextView(nextReminder);
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
 			ContactType contactType = contactTypeListAdapter.getItem(i);
-			boolean isChecked = (contactType.getFlag() & contactTypeFlags) == contactType.getFlag();
+			boolean isChecked = (contactType.getFlag() & contactTypeFlags) != 0;
 			contactTypeListAdapter.setSelected(i, isChecked);
 		}
 	}

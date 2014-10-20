@@ -74,8 +74,10 @@ public class ReminderDatabase {
 	public Reminder readReminder(int contactId)  {
 		Cursor cursor = database.query(RemindersContract.TABLE_REMINDERS, ALL_COLUMNS, 
 				RemindersContract.COLUMN_CONTACT_ID + " = ?", new String[] {Integer.toString(contactId)}, null, null, null);
-		cursor.moveToFirst();
-		Reminder reminder = convertCursorRowToReminder(cursor);
+		Reminder reminder = null;
+		if (cursor.moveToFirst())  {
+			reminder = convertCursorRowToReminder(cursor);
+		}
 		cursor.close();
 		return reminder;
 	}
@@ -96,14 +98,15 @@ public class ReminderDatabase {
 		sendDbChangedBroadcast(Intent.ACTION_INSERT, reminder.getContactId());
 	}
 	
-	public void update(Reminder reminder)  {
+	public int update(Reminder reminder)  {
 		ContentValues values = convertReminderToContentValues(reminder);
-		database.update(RemindersContract.TABLE_REMINDERS,
+		int numUpdated = database.update(RemindersContract.TABLE_REMINDERS,
 				values,
 				RemindersContract.COLUMN_CONTACT_ID + " = ?",
 				new String[] {Integer.toString(reminder.getContactId())});
 		//TODO: Error check
 		sendDbChangedBroadcast(Intent.ACTION_EDIT, reminder.getContactId());
+		return numUpdated;
 	}
 	
 	public void delete(Reminder reminder)  {

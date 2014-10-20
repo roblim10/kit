@@ -40,12 +40,6 @@ public class AlarmService extends IntentService  {
 	}
 	
 	private void setupDatabaseSync()  {
-//		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver()  {
-//			@Override
-//			public void onReceive(Context context, Intent intent) {
-//				refreshAllAlarms();
-//			}
-//		}, new IntentFilter(ReminderDatabase.ACTION_REMINDER_DB_UPDATED));
 		DatabaseChangedReceiver receiver = new DatabaseChangedReceiver();
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Intent.ACTION_INSERT));
 		LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(Intent.ACTION_EDIT));
