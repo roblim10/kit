@@ -5,6 +5,8 @@ import org.joda.time.DateTime;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.android.kit.contacttypes.ContactType;
+
 public class Reminder implements Parcelable {
 	private int id;
 	private String name;
@@ -53,6 +55,10 @@ public class Reminder implements Parcelable {
 	
 	public int getContactTypeFlags()  {
 		return contactTypeFlags;
+	}
+	
+	public boolean hasContactType(ContactType contactType)  {
+		return (contactType.getFlag() & contactTypeFlags) != 0;
 	}
 	
 	public Reminder withFrequency(int newFrequency)  {

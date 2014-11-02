@@ -8,10 +8,10 @@ import android.content.Context;
 import com.google.common.collect.Lists;
 
 public class ContactTypeRegistry {
-	private final List<IContactType> contactTypes;
+	private final List<ContactType> contactTypes;
 	private final int defaultFlag;
 	
-	public ContactTypeRegistry(Context context, List<IContactType> contactTypes)  {
+	public ContactTypeRegistry(Context context, List<ContactType> contactTypes)  {
 		this.contactTypes = Lists.newArrayList(contactTypes);
 		this.defaultFlag = calculateDefaultFlag();
 		registerReceivers(context);
@@ -19,19 +19,19 @@ public class ContactTypeRegistry {
 	
 	private int calculateDefaultFlag()  {
 		int flag = 0;
-		for (IContactType type : contactTypes)  {
+		for (ContactType type : contactTypes)  {
 			flag |= type.isDefaultSelected() ? type.getFlag() : 0;
 		}
 		return flag;
 	}
 	
 	private void registerReceivers(Context context)  {
-		for (IContactType type : contactTypes)  {
-			context.registerReceiver(type.getReceiver(), type.getIntentFilter());
+		for (final ContactType type : contactTypes)  {
+			type.register();
 		}
 	}
 	
-	public List<IContactType> getTypes()  {
+	public List<ContactType> getTypes()  {
 		return Collections.unmodifiableList(contactTypes);
 	}
 	

@@ -25,7 +25,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.android.kit.contacttypes.ContactTypeRegistry;
-import com.android.kit.contacttypes.IContactType;
+import com.android.kit.contacttypes.ContactType;
 import com.android.kit.model.Reminder;
 import com.android.kit.model.TimeUnit;
 import com.android.kit.util.LoadContactImageTask;
@@ -68,7 +68,7 @@ public class EditReminderActivity extends Activity {
 	private NumberPicker unitPicker;
 	private HyperlinkView reminderDateHyperlinkView;
 	private HyperlinkView reminderTimeHyperlinkView;
-	private CheckBoxListAdapter<IContactType> contactTypeListAdapter;
+	private CheckBoxListAdapter<ContactType> contactTypeListAdapter;
 	private ListView contactTypeListView;
 	
 	@Override
@@ -151,7 +151,7 @@ public class EditReminderActivity extends Activity {
 	
 	private void setupContactTypeListView()  {
 		
-		contactTypeListAdapter = new CheckBoxListAdapter<IContactType>(this, contactTypeRegistry.getTypes());
+		contactTypeListAdapter = new CheckBoxListAdapter<ContactType>(this, contactTypeRegistry.getTypes());
 		contactTypeListView = (ListView)findViewById(R.id.activity_edit_reminder_contact_type_listview);
 		contactTypeListView.setAdapter(contactTypeListAdapter);
 	}
@@ -168,7 +168,7 @@ public class EditReminderActivity extends Activity {
 		refreshReminderDateTextView(nextReminder);
 		refreshReminderTimeTextView(nextReminder);
 		for (int i = 0; i < contactTypeListAdapter.getCount(); i++)  {
-			IContactType contactType = contactTypeListAdapter.getItem(i);
+			ContactType contactType = contactTypeListAdapter.getItem(i);
 			boolean isChecked = (contactType.getFlag() & contactTypeFlags) != 0;
 			contactTypeListAdapter.setSelected(i, isChecked);
 		}
@@ -216,7 +216,7 @@ public class EditReminderActivity extends Activity {
 		int frequency = numberPicker.getValue();
 		TimeUnit units = TimeUnit.getTimeUnitFromId(unitPicker.getValue());
 		int contactTypeFlags = 0;
-		for (IContactType contactType : contactTypeListAdapter.getSelectedItems())  {
+		for (ContactType contactType : contactTypeListAdapter.getSelectedItems())  {
 			contactTypeFlags |= contactType.getFlag();
 		}
 		Reminder newReminder = new Reminder(reminderContactId,

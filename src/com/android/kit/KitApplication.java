@@ -5,7 +5,7 @@ import java.util.List;
 import android.app.Application;
 
 import com.android.kit.contacttypes.ContactTypeRegistry;
-import com.android.kit.contacttypes.IContactType;
+import com.android.kit.contacttypes.ContactType;
 import com.android.kit.contacttypes.PhoneContactType;
 import com.android.kit.contacttypes.SmsContactType;
 import com.google.common.collect.Lists;
@@ -19,8 +19,8 @@ public class KitApplication extends Application {
 		contactTypeRegistry = new ContactTypeRegistry(this, createContactTypeList());
 	}
 	
-	private List<IContactType> createContactTypeList()  {
-		List<IContactType> contactTypes = Lists.newArrayList();
+	private List<ContactType> createContactTypeList()  {
+		List<ContactType> contactTypes = Lists.newArrayList();
 		contactTypes.add(new PhoneContactType(this, 1 << 0, true));
 		contactTypes.add(new SmsContactType(this, 1 << 1, false));
 		return contactTypes;
