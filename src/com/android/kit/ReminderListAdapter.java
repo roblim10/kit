@@ -1,6 +1,5 @@
 package com.android.kit;
 
-import java.text.DateFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +7,7 @@ import java.util.Map;
 import org.joda.time.DateTime;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +65,7 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		viewHolder.subTextView.setText(reminderFrequencyText);
 		
 		String reminderText = context.getString(R.string.reminder_list_item_next_reminder,
-				getDateAsString(currentReminder.getNextReminderDate()));
+				getReminderText(currentReminder));
 		viewHolder.reminderTextView.setText(reminderText);
 		
 		int backgroundRes = isSelected(position) ? android.R.color.holo_green_light : android.R.color.transparent;
@@ -73,9 +73,19 @@ public class ReminderListAdapter extends SelectableListAdapter<Reminder>  {
 		return convertView;
 	}
 	
-	private String getDateAsString(DateTime date)  {
-		DateFormat dateFormat = android.text.format.DateFormat.getMediumDateFormat(getContext());
-		return dateFormat.format(date.toDate());
+	private String getReminderText(Reminder reminder)  {
+		Context context = getContext();
+		DateTime date = reminder.getNextReminderDate();
+		String ret;
+		if (date.isBeforeNow())  {
+			ret = context.getString(R.string.reminder_list_item_expired_reminder, reminder.getName());
+		}
+		else  {
+			String dateString = DateFormat.getMediumDateFormat(context).format(date.toDate());
+			String timeString = DateFormat.getTimeFormat(context).format(date.toDate());
+			ret = dateString + " " + timeString;
+		}
+		return ret;
 	}
 	
 	@Override
