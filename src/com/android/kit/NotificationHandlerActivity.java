@@ -138,7 +138,7 @@ public class NotificationHandlerActivity extends ListActivity {
 		DateTime newReminderDate = DateTime.now()
 				.plusDays(1)
 				.withTime(originalReminderDate.getHourOfDay(), originalReminderDate.getMinuteOfHour(), 0, 0);
-		Reminder newReminder = reminder.withNextReminderDate(newReminderDate);
+		Reminder newReminder = reminder.withReminderPeriod(reminder.getStartReminderDate(), newReminderDate);
 		ReminderDatabase.getInstance(this).update(newReminder);
 	}
 	

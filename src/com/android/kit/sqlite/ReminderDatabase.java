@@ -26,6 +26,7 @@ public class ReminderDatabase {
 		RemindersContract.COLUMN_CONTACT_NAME,
 		RemindersContract.COLUMN_FREQUENCY,
 		RemindersContract.COLUMN_TIME_UNIT,
+		RemindersContract.COLUMN_START_REMINDER,
 		RemindersContract.COLUMN_NEXT_REMINDER,
 		RemindersContract.COLUMN_CONTACT_TYPES
 	};
@@ -88,7 +89,8 @@ public class ReminderDatabase {
 				cursor.getInt(2),
 				TimeUnit.getTimeUnitFromId(cursor.getInt(3)),
 				new DateTime(cursor.getLong(4)),
-				cursor.getInt(5));
+				new DateTime(cursor.getLong(5)),
+				cursor.getInt(6));
 		return reminder;
 	}
 	
@@ -122,6 +124,7 @@ public class ReminderDatabase {
 		values.put(RemindersContract.COLUMN_CONTACT_NAME, reminder.getName());
 		values.put(RemindersContract.COLUMN_FREQUENCY, reminder.getFrequency());
 		values.put(RemindersContract.COLUMN_TIME_UNIT, reminder.getFrequencyUnit().getId());
+		values.put(RemindersContract.COLUMN_START_REMINDER, reminder.getStartReminderDate().getMillis());
 		values.put(RemindersContract.COLUMN_NEXT_REMINDER, reminder.getNextReminderDate().getMillis());
 		values.put(RemindersContract.COLUMN_CONTACT_TYPES, reminder.getContactTypeFlags());
 		return values;

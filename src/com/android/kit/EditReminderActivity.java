@@ -39,6 +39,7 @@ public class EditReminderActivity extends Activity {
 	public final static String EXTRA_CONTACT_NAME = "com.android.kit.EXTRA_CONTACT_NAME";
 	public final static String EXTRA_FREQUENCY = "com.android.kit.EXTRA_FREQUENCY";
 	public final static String EXTRA_TIME_UNIT = "com.android.kit.TIME_UNIT";
+	public final static String EXTRA_START_REMINDER = "com.android.kit.EXTRA_START_REMINDER";
 	public final static String EXTRA_NEXT_REMINDER = "com.android.kit.EXTRA_NEXT_REMINDER";
 	public final static String EXTRA_CONTACT_TYPES = "com.android.kit.EXTRA_CONTACT_TYPES";
 	
@@ -60,6 +61,7 @@ public class EditReminderActivity extends Activity {
 	
 	private int reminderContactId;
 	private String reminderContactName;
+	private DateTime startReminder;
 	private DateTime nextReminder;
 	
 	private ImageView contactImageView;
@@ -97,6 +99,7 @@ public class EditReminderActivity extends Activity {
 		reminderContactName = fromIntent.getStringExtra(EXTRA_CONTACT_NAME);
 		int frequency = fromIntent.getIntExtra(EXTRA_FREQUENCY, DEFAULT_FREQUENCY);
 		TimeUnit unit = TimeUnit.getTimeUnitFromId(fromIntent.getIntExtra(EXTRA_TIME_UNIT, DEFAULT_UNIT));
+		startReminder = new DateTime(fromIntent.getLongExtra(EXTRA_START_REMINDER, DateTime.now().getMillis()));
 		nextReminder = new DateTime(fromIntent.getLongExtra(EXTRA_NEXT_REMINDER, DEFAULT_REMINDER_DATE));
 		int contactTypeFlags = fromIntent.getIntExtra(EXTRA_CONTACT_TYPES, contactTypeRegistry.getDefaultFlag());
 		
@@ -223,6 +226,7 @@ public class EditReminderActivity extends Activity {
 				reminderContactName,
 				frequency,
 				units,
+				startReminder,
 				nextReminder,
 				contactTypeFlags);
 		return newReminder;

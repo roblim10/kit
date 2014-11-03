@@ -1,7 +1,5 @@
 package com.android.kit.service;
 
-import org.joda.time.DateTime;
-
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +14,7 @@ public class NotificationRemovedReceiver extends BroadcastReceiver {
 	public void onReceive(Context context, Intent intent) {
 		Log.i("KIT", "Notification removed!");
 		Reminder reminder = intent.getParcelableExtra(AlarmService.EXTRA_REMINDER);
-		
-		DateTime nextReminder = Reminder.calculateNextReminderDate(reminder);
-		Reminder newReminder = reminder.withNextReminderDate(nextReminder);
+		Reminder newReminder = Reminder.createNextReminder(reminder);
 		ReminderDatabase.getInstance(context).update(newReminder);
 	}
 }

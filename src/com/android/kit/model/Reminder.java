@@ -12,14 +12,22 @@ public class Reminder implements Parcelable {
 	private String name;
 	private int reminderFrequency;
 	private TimeUnit reminderFrequencyUnit;
+	private DateTime startReminderDate;
 	private DateTime nextReminderDate;
 	private int contactTypeFlags;
 
-	public Reminder(int id, String name, int reminderFrequency, TimeUnit unit, DateTime nextReminderDate, int contactTypeFlags)  {
+	public Reminder(int id, 
+			String name, 
+			int reminderFrequency, 
+			TimeUnit unit, 
+			DateTime startReminderDate, 
+			DateTime nextReminderDate,
+			int contactTypeFlags)  {
 		this.id = id;
 		this.name = name;
 		this.reminderFrequency = reminderFrequency;
 		this.reminderFrequencyUnit = unit;
+		this.startReminderDate = startReminderDate;
 		this.nextReminderDate = nextReminderDate;
 		this.contactTypeFlags = contactTypeFlags;
 	}
@@ -29,6 +37,7 @@ public class Reminder implements Parcelable {
 		this.name = in.readString();
 		this.reminderFrequency = in.readInt();
 		this.reminderFrequencyUnit = TimeUnit.getTimeUnitFromId(in.readInt());
+		this.startReminderDate = new DateTime(in.readLong());
 		this.nextReminderDate = new DateTime(in.readLong());
 		this.contactTypeFlags = in.readInt();
 	}
@@ -49,6 +58,10 @@ public class Reminder implements Parcelable {
 		return reminderFrequencyUnit;
 	}
 	
+	public DateTime getStartReminderDate()  {
+		return startReminderDate;
+	}
+	
 	public DateTime getNextReminderDate()  {
 		return nextReminderDate;
 	}
@@ -62,28 +75,29 @@ public class Reminder implements Parcelable {
 	}
 	
 	public Reminder withFrequency(int newFrequency)  {
-		return new Reminder(id, name, newFrequency, reminderFrequencyUnit, nextReminderDate, contactTypeFlags);
+		return new Reminder(id, name, newFrequency, reminderFrequencyUnit, startReminderDate, nextReminderDate, contactTypeFlags);
 	}
 	
 	public Reminder withTimeUnit(TimeUnit newUnit)  {
-		return new Reminder(id, name, reminderFrequency, newUnit, nextReminderDate, contactTypeFlags);	
+		return new Reminder(id, name, reminderFrequency, newUnit, startReminderDate, nextReminderDate, contactTypeFlags);	
 	}
 
-	public Reminder withNextReminderDate(DateTime newDate)  {
-		return new Reminder(id, name, reminderFrequency, reminderFrequencyUnit, newDate, contactTypeFlags);
+	public Reminder withReminderPeriod(DateTime startDate, DateTime endDate)  {
+		return new Reminder(id, name, reminderFrequency, reminderFrequencyUnit, startDate, endDate, contactTypeFlags);
 	}
 	
 	public Reminder withContactTypeFlags(int newFlags)  {
-		return new Reminder(id, name, reminderFrequency, reminderFrequencyUnit, nextReminderDate, newFlags);
+		return new Reminder(id, name, reminderFrequency, reminderFrequencyUnit, startReminderDate, nextReminderDate, newFlags);
 	}
 	
 	@Override
 	public String toString()  {
 		return String.format("{id:%d, name:%s, reminderFrequency:%d, reminderFrequencyUnit:%s, " +
-				"nextReminderDate:%s, contactTypeFlags:%d}", 
+				"startReminderDate:%s, nextReminderDate:%s, contactTypeFlags:%d}", 
 				id, name, reminderFrequency, 
-				reminderFrequencyUnit != null ? reminderFrequencyUnit.toString() : "null", 
-				nextReminderDate != null ? nextReminderDate.toString() : "null",
+				reminderFrequencyUnit,
+				startReminderDate,
+				nextReminderDate,
 				contactTypeFlags);
 	}
 	
@@ -98,6 +112,7 @@ public class Reminder implements Parcelable {
 		dest.writeString(name);
 		dest.writeInt(reminderFrequency);
 		dest.writeInt(reminderFrequencyUnit.getId());
+		dest.writeLong(startReminderDate.getMillis());
 		dest.writeLong(nextReminderDate.getMillis());
 		dest.writeInt(contactTypeFlags);
 	}
@@ -114,21 +129,29 @@ public class Reminder implements Parcelable {
 		} 
 	};
 	
-	public static DateTime calculateNextReminderDate(Reminder reminder)  {
-		int frequency = reminder.getFrequency();
-		TimeUnit unit = reminder.getFrequencyUnit();
-		DateTime newReminderDate = reminder.getNextReminderDate();
-		do  {
-			switch (unit)  {
-				case DAYS: newReminderDate = newReminderDate.plusDays(frequency); break;
-				case WEEKS: newReminderDate = newReminderDate.plusWeeks(frequency); break;
-				case MONTHS: newReminderDate = newReminderDate.plusMonths(frequency); break;
-				case YEARS: newReminderDate = newReminderDate.plusYears(frequency); break;
-				default:
-					throw new UnsupportedOperationException("Unknown TimeUnit: " + unit);
-			}
-		} while (newReminderDate.isBeforeNow());
-		return newReminderDate;
+	
+	public static Reminder createNextReminder(Reminder reminder)  {
+		//newStartDate = max{nextReminderDate, now};
+		DateTime newStartDate = reminder.getNextReminderDate();
+		if(reminder.getNextReminderDate().isBeforeNow())  {
+			newStartDate = DateTime.now();
+		}
+		DateTime newReminderDate = calculateNextDate(reminder.getFrequency(), reminder.getFrequencyUnit(), newStartDate);
+		Reminder newReminder = reminder.withReminderPeriod(newStartDate, newReminderDate);
+		return newReminder;
+	}
+	
+	private static DateTime calculateNextDate(int frequency, TimeUnit unit, DateTime beginDate)  {
+		DateTime newDate;
+		switch (unit)  {
+			case DAYS: newDate = beginDate.plusDays(frequency); break;
+			case WEEKS: newDate = beginDate.plusWeeks(frequency); break;
+			case MONTHS: newDate = beginDate.plusMonths(frequency); break;
+			case YEARS: newDate = beginDate.plusYears(frequency); break;
+			default:
+				throw new UnsupportedOperationException("Unknown TimeUnit: " + unit);
+		}
+		return newDate;
 //		return DateTime.now().plusSeconds(20);
 	}
 }

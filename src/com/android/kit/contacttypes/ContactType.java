@@ -2,8 +2,6 @@ package com.android.kit.contacttypes;
 
 import java.util.Set;
 
-import org.joda.time.DateTime;
-
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,6 +10,7 @@ import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.android.kit.model.Reminder;
+import com.android.kit.service.ReminderNotificationHelper;
 import com.android.kit.sqlite.ReminderDatabase;
 import com.google.common.collect.Sets;
 
@@ -32,11 +31,11 @@ public abstract class ContactType  {
 		Set<Integer> contactIds = getContactId(phoneNumber);
 		for (Integer id : contactIds)  {
 			Reminder reminder = ReminderDatabase.getInstance(context).readReminder(id);
-			if (reminder != null && reminder.hasContactType(this))  {
-				DateTime nextReminder = Reminder.calculateNextReminderDate(reminder);
-				reminder = reminder.withNextReminderDate(nextReminder);
-				ReminderDatabase.getInstance(context).update(reminder);
-				Log.i("KIT", "Reset reminder " + reminder);
+			if (reminder != null && reminder.hasContactType(this) && reminder.getStartReminderDate().isBeforeNow())  {
+				Reminder nextReminder = Reminder.createNextReminder(reminder);
+				ReminderDatabase.getInstance(context).update(nextReminder);
+				ReminderNotificationHelper.cancelNotification(context, id);
+				Log.i("KIT", "Reset reminder: " + reminder);
 			}
 		}
 	}

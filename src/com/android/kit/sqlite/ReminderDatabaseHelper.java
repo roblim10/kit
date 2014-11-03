@@ -15,6 +15,7 @@ public class ReminderDatabaseHelper extends SQLiteOpenHelper {
 			+ RemindersContract.COLUMN_CONTACT_NAME + " TEXT,"
 			+ RemindersContract.COLUMN_FREQUENCY + " INTEGER,"
 			+ RemindersContract.COLUMN_TIME_UNIT + " INTEGER,"
+			+ RemindersContract.COLUMN_START_REMINDER + " INTEGER,"
 			+ RemindersContract.COLUMN_NEXT_REMINDER + " INTEGER,"
 			+ RemindersContract.COLUMN_CONTACT_TYPES + " INTEGER"
 			+ ")";
